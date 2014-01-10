@@ -34,6 +34,12 @@
             indent_size: 2,
             preserve_newlines: true
         }));
+        
+        //update chart
+        if(dimpleChart) {
+          dimpleChart.data = output;
+          dimpleChart.draw();
+        }
       }
       catch ( err ) {
         $outputItems.html("(Error!)");
