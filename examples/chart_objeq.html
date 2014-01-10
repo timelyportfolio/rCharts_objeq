@@ -2,7 +2,7 @@
     var queryDirty = true, sourceDirty = true
       , compiledQuery, sourceJSON;
 
-    var $query, $queries, $source, $result, $run, $inputItems, $outputItems;
+    var $query, $queries, $source, $result, $run, $inputItems, $outputItems, dimpleChart;
 
     function beautifySource() {
       $source.val(js_beautify($source.val(), {
@@ -69,15 +69,19 @@
       });
 
       ////**************************CHART BUILDER************************************/////////////
-      (function(){
+      dimpleChart = (function(){
         var opts = {{{ opts }}},
           data = {{{ data }}},
           xAxis = {{{ xAxis }}},
           yAxis = {{{ yAxis }}},
           zAxis = {{{ zAxis }}},
           colorAxis = {{{ colorAxis }}},
-          defaultColors = {{{ defaultColors }}},
+          defaultColors = [],//{{{ defaultColors }}},
           legend = {{{ legend }}};
+          
+          //set value of source to the data from rCharts
+          $source.val(JSON.stringify(data));
+          
         var svg = dimple.newSvg("#" + opts.id, opts.width, opts.height);
 
         //data = dimple.filterData(data, "Owner", ["Aperture", "Black Mesa"])
@@ -187,6 +191,7 @@
         {{{ chart }}}
 
         myChart.draw();
+        return myChart;
       })();
     });
   </script>
