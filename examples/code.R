@@ -5,6 +5,7 @@
 #install()
 
 library(rCharts)
+opts(viewer=NULL)
 
 hairEye <- as.data.frame(HairEyeColor)
 
