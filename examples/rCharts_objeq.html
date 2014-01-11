@@ -45,15 +45,10 @@
     
     textarea {
       font-family: Courier New, Courier, serif;
-      font-size: 16px;
+      font-size: 12px;
     }
 
-    .query, .source, .result {
-      height: 200px;
-    }
-    
     #query, #source, #result {
-      height: 100%;
       width: 100%;      
     }
     
@@ -68,20 +63,20 @@
       <div id="wrap">
     <div class="container">
       <div class="row">
-        <div class="col-md-3">
+        <div class="col-sm-3">
           <div class="source">
             <h3>Source</h3>
             <div class="sourceHolder">
-              <textarea id="source">
+              <textarea class="form-control" rows="8"  id="source">
 
               </textarea>
             </div>
           </div>
-        </div><!--col-md-->
-        <div class="col-md-3">
+        </div><!--col-sm-->
+        <div class="col-sm-3">
           <div class="query">
           <h3>Query</h3>
-          <div class="queryHolder"><textarea id="query"></textarea></div>
+          <div class="queryHolder"><textarea class="form-control" rows="8"  id="query"></textarea></div>
           <label for="queries"></label>
           <div class="queriesHolder">
            <select id ="queries" onchange="chooseQuery();">
@@ -187,23 +182,29 @@
           </select>
           </div>
         </div>
-        </div><!--col-md-->
-        <div class="col-md-1">
-          <button id="run" style="position:relative;top: 80px;">Query</button>
-        </div><!--col-md-->
-        <div class="col-md-5">
+        </div><!--col-sm-->
+        <div class="col-sm-1">
+          <button id="run">Query</button>
+        </div><!--col-sm-->
+        <div class="col-sm-5">
           <div class="result">
             <h3>Result</h3>
             <div class="resultHolder">
-              <textarea id="result" readonly="readonly"></textarea>
+              <textarea class="form-control" rows="8"  id="result" readonly="readonly"></textarea>
             </div>
           </div>
-        </div><!--col-md-->
+        </div><!--col-sm-->
       </div><!--row-->
       <div class="row">
+        <div class="col-sm-3">
+          <h3>rCharts Config</h3>
+          <textarea class="form-control" rows=8 id="rChartsConfig"></textarea>
+        </div>
+        <div class="col-sm-9">
           {{# chartId }}
             <{{container}} id='{{chartId}}' class='rChart {{ lib }}'></{{container}}>  
           {{/ chartId }}
+        </div>
       </div><!--row-->
     </div><!--container-->
   </div><!--wrap-->
