@@ -48,16 +48,7 @@
     textarea {
       font-family: Courier New, Courier, serif;
       font-size: 12px;
-    }
-
-    #query, #source, #result {
-      width: 100%;      
-    }
-    
-    #queries {
-      width: 100%;
-    }
-   
+    } 
   </style>    
     
   </head>
@@ -75,22 +66,17 @@
             </div>
           </div>
         </div><!--col-sm-->
-        <div class="col-sm-3">
+        <div class="col-sm-4">
             <h3>Query</h3>
-            <div class="input-group">
+            <div class="input-group" style="width:100%;">
               <div class="queryHolder"><textarea class="form-control" rows="8"  id="query"></textarea>
-              <span class="input-group-addon"><button id="run" class="btn btn-default">Query</button></span>
               </div>
-            </div>
-            <label for="queries"></label>
-            <div class="queriesHolder">
-              <select id ="queries" onchange="chooseQuery();">
-              </select>
+                <button id="run" class="btn btn-default"style="position:absolute;bottom:10px;right:15px;">Query</button>              
             </div>
         </div><!--col-sm-->
         <div class="col-sm-5">
           <div class="result">
-            <h3>Result</h3>
+            <h3>Result<span id="outputItems"></span></h3>
             <div class="resultHolder">
               <textarea class="form-control" rows="8"  id="result" readonly="readonly"></textarea>
             </div>
@@ -100,10 +86,10 @@
       <div class="row">
         <div class="col-sm-3">
           <h3>rCharts Config</h3>
-          <textarea class="form-control" rows=8 id="rChartsConfig"></textarea>
+          <textarea class="form-control" rows=14 id="rChartsConfig"></textarea>
         </div>
         <div class="col-sm-9">
-            <div id='chart1fd453dc4160' class='rChart examples'></div>  
+            <div id='chart22843e1c29cf' class='rChart examples'></div>  
         </div>
       </div><!--row-->
     </div><!--container-->
@@ -113,7 +99,7 @@
     var queryDirty = true, sourceDirty = true
       , compiledQuery, sourceJSON;
 
-    var $query, $queries, $source, $result, $run, $inputItems, $outputItems, dimpleChart;
+    var $query, $queries, $source, $result, $run, $inputItems, $outputItems, $rChartsConfig, dimpleChart;
 
     function beautifySource() {
       $source.val(js_beautify($source.val(), {
@@ -173,6 +159,7 @@
       $result = $('#result');
       $inputItems = $('#inputItems');
       $outputItems = $('#outputItems');
+      $rChartsConfig = $('#rChartsConfig');
 
       beautifySource();
       chooseQuery();
@@ -188,14 +175,14 @@
       ////**************************CHART BUILDER************************************/////////////
       dimpleChart = (function(){
         var opts = {
- "dom": "chart1fd453dc4160",
+ "dom": "chart22843e1c29cf",
 "width":    800,
 "height":    400,
 "x": "Sex",
 "y": "Freq",
 "groups": "Hair",
 "type": "bar",
-"id": "chart1fd453dc4160" 
+"id": "chart22843e1c29cf" 
 },
           data = [
  {
@@ -406,7 +393,20 @@
           
           //set value of source to the data from rCharts
           $source.val(JSON.stringify(data));
-          
+          //set value of rCharts config
+          $rChartsConfig.val(
+            js_beautify(JSON.stringify(
+              {"opts": opts,
+               "xAxis": xAxis,
+               "yAxis": yAxis,
+               "zAxis": zAxis,
+               "colorAxis": colorAxis,
+               "defaultColors": defaultColors,
+               "legend": legend
+              }),
+            {indent_size: 2,
+            preserve_newlines: true}
+          ));
         var svg = dimple.newSvg("#" + opts.id, opts.width, opts.height);
 
         //data = dimple.filterData(data, "Owner", ["Aperture", "Black Mesa"])
