@@ -86,10 +86,13 @@
       <div class="row">
         <div class="col-sm-3">
           <h3>rCharts Config</h3>
-          <textarea class="form-control" rows=14 id="rChartsConfig"></textarea>
+          <div class="input-group" style="width:100%;">
+            <textarea class="form-control" rows=14 id="rChartsConfig"></textarea>
+            <button id="config" class="btn btn-default"style="position:absolute;bottom:10px;right:20px;">Config</button>                          
+          </div>
         </div>
         <div class="col-sm-9">
-            <div id='chart22843e1c29cf' class='rChart examples'></div>  
+            <div id='chart13ec61ad1609' class='rChart examples'></div>  
         </div>
       </div><!--row-->
     </div><!--container-->
@@ -99,7 +102,7 @@
     var queryDirty = true, sourceDirty = true
       , compiledQuery, sourceJSON;
 
-    var $query, $queries, $source, $result, $run, $inputItems, $outputItems, $rChartsConfig, dimpleChart;
+    var $query, $queries, $source, $result, $run, $inputItems, $outputItems, $rChartsConfig, $config, dimpleChart;
 
     function beautifySource() {
       $source.val(js_beautify($source.val(), {
@@ -135,7 +138,8 @@
         //update chart
         if(dimpleChart) {
           dimpleChart.data = output;
-          dimpleChart.draw(2000);
+          updateChartConfig();
+          dimpleChart.draw(1000);
         }
       }
       catch ( err ) {
@@ -150,6 +154,127 @@
       queryDirty = true;
       performQuery();
     }
+    
+      ////**************************CHART CONFIGURATOR***************////////////////////
+     function updateChartConfig(){     
+        if (!($rChartsConfig.val() === "")) {
+          var config = JSON.parse($rChartsConfig.val());          
+          
+          svg = d3.select("#" + config.opts.id).select("svg")
+            .attr("width", config.opts.width)
+            .attr("height", config.opts.height);
+        
+          //data = dimple.filterData(data, "Owner", ["Aperture", "Black Mesa"])
+          
+          if (svg.selectAll("g")[0].length > 0) {
+            svg.selectAll("*").transition(1000).attr("opacity",0.00001).remove()
+          }
+          
+          dimpleChart = new dimple.chart(svg, dimpleChart.data);       
+          
+          if (config.opts.bounds) {
+            dimpleChart.setBounds(config.opts.bounds.x, config.opts.bounds.y, config.opts.bounds.width, config.opts.bounds.height);//dimpleChart.setBounds(80, 30, 480, 330);
+          }
+          //dimple allows use of custom CSS with noFormats
+          if(config.opts.noFormats) { dimpleChart.noFormats = config.opts.noFormats; };
+          //for markimekko and addAxis also have third parameter measure
+          //so need to evaluate if measure provided
+          //x axis
+          var x;
+          if(config.xAxis.measure) {
+            x = dimpleChart[config.xAxis.type]("x",config.opts.x,config.xAxis.measure);
+          } else {
+            x = dimpleChart[config.xAxis.type]("x", config.opts.x);
+          };
+          if(!(config.xAxis.type === "addPctAxis")) x.showPercent = config.xAxis.showPercent;
+          if (config.xAxis.orderRule) x.addOrderRule(config.xAxis.orderRule);
+          if (config.xAxis.grouporderRule) x.addGroupOrderRule(config.xAxis.grouporderRule);  
+          if (config.xAxis.overrideMin) x.overrideMin = config.xAxis.overrideMin;
+          if (config.xAxis.overrideMax) x.overrideMax = config.xAxis.overrideMax;
+          if (config.xAxis.overrideMax) x.overrideMax = config.xAxis.overrideMax;
+          if (config.xAxis.inputFormat) x.dateParseFormat = config.xAxis.inputFormat;
+          if (config.xAxis.outputFormat) x.tickFormat = config.xAxis.outputFormat;
+          //y axis
+          var y;
+          if(config.yAxis.measure) {
+            y = dimpleChart[config.yAxis.type]("y",config.opts.y,config.yAxis.measure);
+          } else {
+            y = dimpleChart[config.yAxis.type]("y", config.opts.y);
+          };
+          if(!(config.yAxis.type === "addPctAxis")) y.showPercent = config.yAxis.showPercent;
+          if (config.yAxis.orderRule) y.addOrderRule(config.yAxis.orderRule);
+          if (config.yAxis.grouporderRule) y.addGroupOrderRule(config.yAxis.grouporderRule);
+          if (config.yAxis.overrideMin) y.overrideMin = config.yAxis.overrideMin;
+          if (config.yAxis.overrideMax) y.overrideMax = config.yAxis.overrideMax;
+          if (config.yAxis.inputFormat) y.dateParseFormat = config.yAxis.inputFormat;
+          if (config.yAxis.outputFormat) y.tickFormat = config.yAxis.outputFormat;
+        //z for bubbles
+            var z;
+          if (!(typeof(config.zAxis) === 'undefined') && config.zAxis.type){
+            if(config.zAxis.measure) {
+              z = dimpleChart[config.zAxis.type]("z",config.opts.z,config.zAxis.measure);
+            } else {
+              z = dimpleChart[config.zAxis.type]("z", config.opts.z);
+            };
+            if(!(config.zAxis.type === "addPctAxis")) z.showPercent = config.zAxis.showPercent;
+            if (config.zAxis.orderRule) z.addOrderRule(config.zAxis.orderRule);
+            if (config.zAxis.overrideMin) z.overrideMin = config.zAxis.overrideMin;
+            if (config.zAxis.overrideMax) z.overrideMax = config.zAxis.overrideMax;
+          }
+          if(d3.keys(config.colorAxis).length > 0) {
+            dimpleChart[config.colorAxis.type](config.colorAxis.colorSeries,config.colorAxis.palette) ;
+          }
+  
+          //allow manipulation of default colors to use with dimple
+          if(config.defaultColors.length) {
+            config.defaultColors = config.defaultColors[0];
+            if (typeof(config.defaultColors) == "function") {
+              //assume this is a d3 scale
+              //for now loop through first 20 but need a better way to handle
+              config.defaultColorsArray = [];
+              for (var n=0;n<20;n++) {
+                config.defaultColorsArray.push(config.defaultColors(n));
+              };
+              config.defaultColors = config.defaultColorsArray;
+            }
+            config.defaultColors.forEach(function(d,i) {
+              config.defaultColors[i] = new dimple.color(d);
+            })
+            dimpleChart.config.defaultColors = config.defaultColors;
+          }
+    
+          //here need think I need to evaluate group and if missing do null
+          //as the first argument
+          //if provided need to use groups from opts
+          if(config.opts.hasOwnProperty("groups")) {
+            var s = dimpleChart.addSeries( config.opts.groups, dimple.plot[config.opts.type] );
+            //series offers an aggregate method that we will also need to check if available
+            //options available are avg, count, max, min, sum
+            if (!(typeof(config.opts.aggregate) === 'undefined')) {
+              s.aggregate = eval(config.opts.aggregate);
+            }
+            if (!(typeof(config.opts.lineWeight) === 'undefined')) {
+              s.lineWeight = eval(config.opts.lineWeight);
+            }
+            if (!(typeof(config.opts.barGap) === 'undefined')) {
+              s.barGap = eval(config.opts.barGap);
+            }    
+          } else var s = dimpleChart.addSeries( null, dimple.plot[config.opts.type] );
+          //unsure if this is best but if config.legend is provided (not empty) then evaluate
+          if(d3.keys(config.legend).length > 0) {
+            var l =dimpleChart.addLegend();
+            d3.keys(config.legend).forEach(function(d){
+              l[d] = config.legend[d];
+            });
+          }
+          //quick way to get this going but need to make this cleaner
+          if(config.opts.storyboard) {
+            dimpleChart.setStoryboard(config.opts.storyboard);
+          };
+          
+          dimpleChart.draw();
+        }
+    }    
 
     $(window).ready(function() {
       $query = $('#query');
@@ -160,29 +285,33 @@
       $inputItems = $('#inputItems');
       $outputItems = $('#outputItems');
       $rChartsConfig = $('#rChartsConfig');
+      $config = $('#config');      
 
       beautifySource();
       chooseQuery();
 
       $run.click(performQuery);
+      $config.click(updateChartConfig);
+      
       $query.change(function() {
         queryDirty = true;
       });
       $source.change(function() {
         sourceDirty = true;
       });
+      
 
       ////**************************CHART BUILDER************************************/////////////
       dimpleChart = (function(){
         var opts = {
- "dom": "chart22843e1c29cf",
+ "dom": "chart13ec61ad1609",
 "width":    800,
 "height":    400,
 "x": "Sex",
 "y": "Freq",
 "groups": "Hair",
 "type": "bar",
-"id": "chart22843e1c29cf" 
+"id": "chart13ec61ad1609" 
 },
           data = [
  {
