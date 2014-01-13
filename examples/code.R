@@ -20,3 +20,6 @@ d1$setLib(".")
 d1$templates$page = "rCharts_objeq.html"
 d1$templates$script = paste0(getwd(),"/chart_objeq.html")
 d1
+
+
+d1$save("rCharts_objeq_example.html",cdn=F)
