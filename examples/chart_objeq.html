@@ -2,7 +2,7 @@
     var queryDirty = true, sourceDirty = true
       , compiledQuery, sourceJSON;
 
-    var $query, $queries, $source, $result, $run, $inputItems, $outputItems, dimpleChart;
+    var $query, $queries, $source, $result, $run, $inputItems, $outputItems, $rChartsConfig, dimpleChart;
 
     function beautifySource() {
       $source.val(js_beautify($source.val(), {
@@ -62,6 +62,7 @@
       $result = $('#result');
       $inputItems = $('#inputItems');
       $outputItems = $('#outputItems');
+      $rChartsConfig = $('#rChartsConfig');
 
       beautifySource();
       chooseQuery();
@@ -87,7 +88,20 @@
           
           //set value of source to the data from rCharts
           $source.val(JSON.stringify(data));
-          
+          //set value of rCharts config
+          $rChartsConfig.val(
+            js_beautify(JSON.stringify(
+              {"opts": opts,
+               "xAxis": xAxis,
+               "yAxis": yAxis,
+               "zAxis": zAxis,
+               "colorAxis": colorAxis,
+               "defaultColors": defaultColors,
+               "legend": legend
+              }),
+            {indent_size: 2,
+            preserve_newlines: true}
+          ));
         var svg = dimple.newSvg("#" + opts.id, opts.width, opts.height);
 
         //data = dimple.filterData(data, "Owner", ["Aperture", "Black Mesa"])
