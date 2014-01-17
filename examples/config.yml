@@ -1,6 +1,6 @@
 dimple_objeq:
   jshead: 
-    - js/objeq.min.js
+    - js/objeq.js
     - js/extensions.js
     - js/beautify.js
     - js/jquery.min.js
