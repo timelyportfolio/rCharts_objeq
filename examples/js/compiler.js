@@ -3,7 +3,7 @@ var slice = Array.prototype.slice
   , defineProperties = Object.defineProperty
   , extendContext = Object.create
   , objectKeys = Object.keys
-  , extendObject = util.extendObject;
+  , extendObject = extendObject;
 
 // The nextGroupKey must be global since an Object may participate in
 // multiple junqi environments.

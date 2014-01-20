@@ -3,6 +3,10 @@
       , compiledQuery, sourceJSON;
 
     var $query, $queries, $source, $result, $run, $inputItems, $outputItems, $chartConfig, $config, dimpleChart, rChartsOriginal;
+    
+    var junqi = createJunqiEnvironment()
+    var $objeq = junqi.objeq;
+    junqi.registerExtensions(DefaultExtensions)    
 
     function beautifySource() {
       $source.val(js_beautify($source.val(), {
@@ -14,7 +18,11 @@
     function performQuery() {
       try {
         if ( queryDirty ) {
-          compiledQuery = $objeq(query.value);
+          if(query.value === ""){
+            //if query is blank          
+          } else {
+            compiledQuery = $objeq(query.value);
+          }
           queryDirty = false;
         }
 
