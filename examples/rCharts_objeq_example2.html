@@ -4,9 +4,12 @@
   <head>
     <link rel='stylesheet' href='css/bootstrap.css'>
     
-    <script src='js/objeq.js' type='text/javascript'></script>
-    <script src='js/objeq-parser.js' type='text/javascript'></script>
-    <script src='js/extensions.js' type='text/javascript'></script>
+    <script src='js/util.js' type='text/javascript'></script>
+    <script src='js/parser.js' type='text/javascript'></script>
+    <script src='js/objeq-parser-junqi.js' type='text/javascript'></script>
+    <script src='js/compiler.js' type='text/javascript'></script>
+    <script src='js/junqi.js' type='text/javascript'></script>
+    <script src='js/index_junqi_extensions.js' type='text/javascript'></script>
     <script src='js/beautify.js' type='text/javascript'></script>
     <script src='js/jquery.min.js' type='text/javascript'></script>
     <script src='js/bootstrap.js' type='text/javascript'></script>
@@ -93,7 +96,7 @@
           </div>
         </div>
         <div class="col-sm-9">
-            <div id='chart221ce177fe1' class='rChart examples'></div>  
+            <div id='chart19901e04394c' class='rChart examples'></div>  
         </div>
       </div><!--row-->
     </div><!--container-->
@@ -104,6 +107,10 @@
       , compiledQuery, sourceJSON;
 
     var $query, $queries, $source, $result, $run, $inputItems, $outputItems, $chartConfig, $config, dimpleChart, rChartsOriginal;
+    
+    var junqi = createJunqiEnvironment()
+    var $objeq = junqi.objeq;
+    junqi.registerExtensions(DefaultExtensions)    
 
     function beautifySource() {
       $source.val(js_beautify($source.val(), {
@@ -115,7 +122,11 @@
     function performQuery() {
       try {
         if ( queryDirty ) {
-          compiledQuery = $objeq(query.value);
+          if(query.value === ""){
+            
+          } else {
+            compiledQuery = $objeq(query.value);
+          }
           queryDirty = false;
         }
 
@@ -293,7 +304,7 @@
       $config = $('#config');      
 
       beautifySource();
-      chooseQuery();
+      //chooseQuery();
 
       $run.click(performQuery);
       $config.click(function(){
@@ -311,14 +322,14 @@
       ////**************************CHART BUILDER************************************/////////////
       dimpleChart = (function(){
         var opts = {
- "dom": "chart221ce177fe1",
+ "dom": "chart19901e04394c",
 "width":    800,
 "height":    400,
 "x": "UnitSales",
 "y": "OperatingProfit",
 "groups": [ "SKU", "Channel" ],
 "type": "bubble",
-"id": "chart221ce177fe1" 
+"id": "chart19901e04394c" 
 },
           data = [
  {
