@@ -1,7 +1,11 @@
 dimple_objeq:
   jshead: 
-    - js/objeq.js
-    - js/extensions.js
+    - js/util.js
+    - js/parser.js
+    - js/objeq-parser-junqi.js
+    - js/compiler.js
+    - js/junqi.js
+    - js/index_junqi_extensions.js
     - js/beautify.js
     - js/jquery.min.js
     - js/bootstrap.js
