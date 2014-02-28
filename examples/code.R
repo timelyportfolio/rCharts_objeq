@@ -18,7 +18,7 @@ d1 <- dPlot(
 #d1$set(defaultColors=c())
 d1$setLib(".")
 d1$templates$page = "rCharts_objeq.html"
-d1$templates$script = paste0("./chart_objeq.html")
+d1$templates$script = "./chart_objeq.html"
 d1
 
 d1$save("rCharts_objeq_example.html",cdn=F)
