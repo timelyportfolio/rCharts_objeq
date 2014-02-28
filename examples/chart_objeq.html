@@ -67,13 +67,22 @@
     }
     
       ////**************************CHART CONFIGURATOR***************////////////////////
-     function drawChart(data,config){     
+     function drawChart(data,opts){     
         if (!($chartConfig.val() === "")) {
-          config = JSON.parse($chartConfig.val());
+          opts = JSON.parse($chartConfig.val());
         };
+        
+        var svg = d3.select("#" + opts.id).select("svg")
+          .attr("width", opts.width)
+          .attr("height", opts.height);
+
+        if (svg.selectAll("g").length > 0) {
+          svg.selectAll("*").transition(1000).attr("opacity",0.00001).remove()
+        } else {
+          svg = dimple.newSvg("#" + opts.id, opts.width, opts.height);
+        }
           
-        var svg = dimple.newSvg("#" + opts.id, opts.width, opts.height);
-    
+  
       //data = dimple.filterData(data, "Owner", ["Aperture", "Black Mesa"])
       var myChart = new dimple.chart(svg, data);
       if (opts.bounds) {
@@ -195,7 +204,7 @@
         myChart.setStoryboard(opts.storyboard);
       };
       myChart.draw();
-      return chart;
+      return myChart;
     }    
 
     $(window).ready(function() {
@@ -227,31 +236,16 @@
 
       ////**************************CHART BUILDER************************************/////////////
       dimpleChart = (function(){
-        var opts = {{{ opts }}},
-          data = {{{ data }}},
-          xAxis = {{{ xAxis }}},
-          yAxis = {{{ yAxis }}},
-          zAxis = {{{ zAxis }}},
-          colorAxis = {{{ colorAxis }}},
-          defaultColors = [],//{{{ defaultColors }}},
-          legend = {{{ legend }}};
-          
-          var config = {"opts": opts,
-               "xAxis": xAxis,
-               "yAxis": yAxis,
-               "zAxis": zAxis,
-               "colorAxis": colorAxis,
-               "defaultColors": defaultColors,
-               "legend": legend
-              };
+          var opts = {{{ opts }}},
+          data = {{{ data }}};          
                 
-          rChartsOriginal = {data:data,config:config};
+          rChartsOriginal = {data:data,opts:opts};
           
           //set value of source to the data from rCharts
           $source.val(JSON.stringify(data));
           //set value of rCharts config
           $chartConfig.val(
-            js_beautify(JSON.stringify(config),
+            js_beautify(JSON.stringify(opts),
                         {indent_size: 2,
                         preserve_newlines: true}
             )
@@ -261,7 +255,7 @@
         //these can be provided by dMyChart$chart( ... )
         {{{ chart }}}
 
-        return drawChart(data,config);
+        return drawChart(data,opts);
       })();
     });
   </script>
