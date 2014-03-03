@@ -2,19 +2,19 @@
 <meta charset = 'utf-8'>
 <html>
   <head>
-    <link rel='stylesheet' href='C:\Users\Kent.TLEAVELL_NT\Dropbox\development\r\rCharts_objeq\examples/css/bootstrap.css'>
+    <link rel='stylesheet' href='./css/bootstrap.css'>
     
-    <script src='C:\Users\Kent.TLEAVELL_NT\Dropbox\development\r\rCharts_objeq\examples/js/util.js' type='text/javascript'></script>
-    <script src='C:\Users\Kent.TLEAVELL_NT\Dropbox\development\r\rCharts_objeq\examples/js/parser.js' type='text/javascript'></script>
-    <script src='C:\Users\Kent.TLEAVELL_NT\Dropbox\development\r\rCharts_objeq\examples/js/objeq-parser-junqi.js' type='text/javascript'></script>
-    <script src='C:\Users\Kent.TLEAVELL_NT\Dropbox\development\r\rCharts_objeq\examples/js/compiler.js' type='text/javascript'></script>
-    <script src='C:\Users\Kent.TLEAVELL_NT\Dropbox\development\r\rCharts_objeq\examples/js/junqi.js' type='text/javascript'></script>
-    <script src='C:\Users\Kent.TLEAVELL_NT\Dropbox\development\r\rCharts_objeq\examples/js/index_junqi_extensions.js' type='text/javascript'></script>
-    <script src='C:\Users\Kent.TLEAVELL_NT\Dropbox\development\r\rCharts_objeq\examples/js/beautify.js' type='text/javascript'></script>
-    <script src='C:\Users\Kent.TLEAVELL_NT\Dropbox\development\r\rCharts_objeq\examples/js/jquery.min.js' type='text/javascript'></script>
-    <script src='C:\Users\Kent.TLEAVELL_NT\Dropbox\development\r\rCharts_objeq\examples/js/bootstrap.js' type='text/javascript'></script>
-    <script src='C:\Users\Kent.TLEAVELL_NT\Dropbox\development\r\rCharts_objeq\examples/js/d3.js' type='text/javascript'></script>
-    <script src='C:\Users\Kent.TLEAVELL_NT\Dropbox\development\r\rCharts_objeq\examples/js/dimple.v1.1.5.js' type='text/javascript'></script>
+    <script src='./js/util.js' type='text/javascript'></script>
+    <script src='./js/parser.js' type='text/javascript'></script>
+    <script src='./js/objeq-parser-junqi.js' type='text/javascript'></script>
+    <script src='./js/compiler.js' type='text/javascript'></script>
+    <script src='./js/junqi.js' type='text/javascript'></script>
+    <script src='./js/index_junqi_extensions.js' type='text/javascript'></script>
+    <script src='./js/beautify.js' type='text/javascript'></script>
+    <script src='./js/jquery.min.js' type='text/javascript'></script>
+    <script src='./js/bootstrap.js' type='text/javascript'></script>
+    <script src='./js/d3.js' type='text/javascript'></script>
+    <script src='./js/dimple.v1.1.5.js' type='text/javascript'></script>
     
     <style>
     .rChart {
@@ -96,7 +96,7 @@
           </div>
         </div>
         <div class="col-sm-9">
-            <div id='chart1ea47dcc1dce' class='rChart examples'></div>  
+            <div id='chartad85acfdb1' class='rChart examples'></div>  
         </div>
       </div><!--row-->
     </div><!--container-->
@@ -171,13 +171,22 @@
     }
     
       ////**************************CHART CONFIGURATOR***************////////////////////
-     function drawChart(data,config){     
+     function drawChart(data,opts){     
         if (!($chartConfig.val() === "")) {
-          config = JSON.parse($chartConfig.val());
+          opts = JSON.parse($chartConfig.val());
         };
+        
+        var svg = d3.select("#" + opts.id).select("svg")
+          .attr("width", opts.width)
+          .attr("height", opts.height);
+
+        if (svg.selectAll("g").length > 0) {
+          svg.selectAll("*").transition(1000).attr("opacity",0.00001).remove()
+        } else {
+          svg = dimple.newSvg("#" + opts.id, opts.width, opts.height);
+        }
           
-        var svg = dimple.newSvg("#" + opts.id, opts.width, opts.height);
-    
+  
       //data = dimple.filterData(data, "Owner", ["Aperture", "Black Mesa"])
       var myChart = new dimple.chart(svg, data);
       if (opts.bounds) {
@@ -299,7 +308,7 @@
         myChart.setStoryboard(opts.storyboard);
       };
       myChart.draw();
-      return chart;
+      return myChart;
     }    
 
     $(window).ready(function() {
@@ -331,8 +340,8 @@
 
       ////**************************CHART BUILDER************************************/////////////
       dimpleChart = (function(){
-        var opts = {
- "dom": "chart1ea47dcc1dce",
+          var opts = {
+ "dom": "chartad85acfdb1",
 "width":    800,
 "height":    400,
 "xAxis": {
@@ -352,32 +361,17 @@
 "y": "Freq",
 "groups": "Hair",
 "type": "bar",
-"id": "chart1ea47dcc1dce" 
+"id": "chartad85acfdb1" 
 },
-          data = [{"Hair":"Black","Eye":"Brown","Sex":"Male","Freq":32},{"Hair":"Brown","Eye":"Brown","Sex":"Male","Freq":53},{"Hair":"Red","Eye":"Brown","Sex":"Male","Freq":10},{"Hair":"Blond","Eye":"Brown","Sex":"Male","Freq":3},{"Hair":"Black","Eye":"Blue","Sex":"Male","Freq":11},{"Hair":"Brown","Eye":"Blue","Sex":"Male","Freq":50},{"Hair":"Red","Eye":"Blue","Sex":"Male","Freq":10},{"Hair":"Blond","Eye":"Blue","Sex":"Male","Freq":30},{"Hair":"Black","Eye":"Hazel","Sex":"Male","Freq":10},{"Hair":"Brown","Eye":"Hazel","Sex":"Male","Freq":25},{"Hair":"Red","Eye":"Hazel","Sex":"Male","Freq":7},{"Hair":"Blond","Eye":"Hazel","Sex":"Male","Freq":5},{"Hair":"Black","Eye":"Green","Sex":"Male","Freq":3},{"Hair":"Brown","Eye":"Green","Sex":"Male","Freq":15},{"Hair":"Red","Eye":"Green","Sex":"Male","Freq":7},{"Hair":"Blond","Eye":"Green","Sex":"Male","Freq":8},{"Hair":"Black","Eye":"Brown","Sex":"Female","Freq":36},{"Hair":"Brown","Eye":"Brown","Sex":"Female","Freq":66},{"Hair":"Red","Eye":"Brown","Sex":"Female","Freq":16},{"Hair":"Blond","Eye":"Brown","Sex":"Female","Freq":4},{"Hair":"Black","Eye":"Blue","Sex":"Female","Freq":9},{"Hair":"Brown","Eye":"Blue","Sex":"Female","Freq":34},{"Hair":"Red","Eye":"Blue","Sex":"Female","Freq":7},{"Hair":"Blond","Eye":"Blue","Sex":"Female","Freq":64},{"Hair":"Black","Eye":"Hazel","Sex":"Female","Freq":5},{"Hair":"Brown","Eye":"Hazel","Sex":"Female","Freq":29},{"Hair":"Red","Eye":"Hazel","Sex":"Female","Freq":7},{"Hair":"Blond","Eye":"Hazel","Sex":"Female","Freq":5},{"Hair":"Black","Eye":"Green","Sex":"Female","Freq":2},{"Hair":"Brown","Eye":"Green","Sex":"Female","Freq":14},{"Hair":"Red","Eye":"Green","Sex":"Female","Freq":7},{"Hair":"Blond","Eye":"Green","Sex":"Female","Freq":8}],
-          xAxis = ,
-          yAxis = ,
-          zAxis = ,
-          colorAxis = ,
-          defaultColors = [],//,
-          legend = ;
-          
-          var config = {"opts": opts,
-               "xAxis": xAxis,
-               "yAxis": yAxis,
-               "zAxis": zAxis,
-               "colorAxis": colorAxis,
-               "defaultColors": defaultColors,
-               "legend": legend
-              };
+          data = [{"Hair":"Black","Eye":"Brown","Sex":"Male","Freq":32},{"Hair":"Brown","Eye":"Brown","Sex":"Male","Freq":53},{"Hair":"Red","Eye":"Brown","Sex":"Male","Freq":10},{"Hair":"Blond","Eye":"Brown","Sex":"Male","Freq":3},{"Hair":"Black","Eye":"Blue","Sex":"Male","Freq":11},{"Hair":"Brown","Eye":"Blue","Sex":"Male","Freq":50},{"Hair":"Red","Eye":"Blue","Sex":"Male","Freq":10},{"Hair":"Blond","Eye":"Blue","Sex":"Male","Freq":30},{"Hair":"Black","Eye":"Hazel","Sex":"Male","Freq":10},{"Hair":"Brown","Eye":"Hazel","Sex":"Male","Freq":25},{"Hair":"Red","Eye":"Hazel","Sex":"Male","Freq":7},{"Hair":"Blond","Eye":"Hazel","Sex":"Male","Freq":5},{"Hair":"Black","Eye":"Green","Sex":"Male","Freq":3},{"Hair":"Brown","Eye":"Green","Sex":"Male","Freq":15},{"Hair":"Red","Eye":"Green","Sex":"Male","Freq":7},{"Hair":"Blond","Eye":"Green","Sex":"Male","Freq":8},{"Hair":"Black","Eye":"Brown","Sex":"Female","Freq":36},{"Hair":"Brown","Eye":"Brown","Sex":"Female","Freq":66},{"Hair":"Red","Eye":"Brown","Sex":"Female","Freq":16},{"Hair":"Blond","Eye":"Brown","Sex":"Female","Freq":4},{"Hair":"Black","Eye":"Blue","Sex":"Female","Freq":9},{"Hair":"Brown","Eye":"Blue","Sex":"Female","Freq":34},{"Hair":"Red","Eye":"Blue","Sex":"Female","Freq":7},{"Hair":"Blond","Eye":"Blue","Sex":"Female","Freq":64},{"Hair":"Black","Eye":"Hazel","Sex":"Female","Freq":5},{"Hair":"Brown","Eye":"Hazel","Sex":"Female","Freq":29},{"Hair":"Red","Eye":"Hazel","Sex":"Female","Freq":7},{"Hair":"Blond","Eye":"Hazel","Sex":"Female","Freq":5},{"Hair":"Black","Eye":"Green","Sex":"Female","Freq":2},{"Hair":"Brown","Eye":"Green","Sex":"Female","Freq":14},{"Hair":"Red","Eye":"Green","Sex":"Female","Freq":7},{"Hair":"Blond","Eye":"Green","Sex":"Female","Freq":8}];          
                 
-          rChartsOriginal = {data:data,config:config};
+          rChartsOriginal = {data:data,opts:opts};
           
           //set value of source to the data from rCharts
           $source.val(JSON.stringify(data));
           //set value of rCharts config
           $chartConfig.val(
-            js_beautify(JSON.stringify(config),
+            js_beautify(JSON.stringify(opts),
                         {indent_size: 2,
                         preserve_newlines: true}
             )
@@ -387,7 +381,7 @@
         //these can be provided by dMyChart$chart( ... )
         
 
-        return drawChart(data,config);
+        return drawChart(data,opts);
       })();
     });
   </script>
