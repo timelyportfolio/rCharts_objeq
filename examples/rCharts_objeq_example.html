@@ -71,7 +71,7 @@
           </div>
         </div><!--col-sm-->
         <div class="col-sm-4">
-            <h3>Query<a href="https://github.com/agilosoftware/objeq/wiki/Language-Reference" target="_blank"> (help)</a></h3>
+            <h3>Query (<a href="https://github.com/agilosoftware/objeq/wiki/Language-Reference" target="_blank">help </a> or <a href="http://www.kode4food.it/js/objeq/index.html" target="_blank"> examples</a>)</h3>
             <div class="input-group" style="width:100%;">
               <div class="queryHolder"><textarea class="form-control" rows="8"  id="query"></textarea>
               </div>
@@ -96,7 +96,7 @@
           </div>
         </div>
         <div class="col-sm-9">
-            <div id='chartad85acfdb1' class='rChart examples'></div>  
+            <div id='chartad85641b26' class='rChart examples'></div>  
         </div>
       </div><!--row-->
     </div><!--container-->
@@ -341,7 +341,7 @@
       ////**************************CHART BUILDER************************************/////////////
       dimpleChart = (function(){
           var opts = {
- "dom": "chartad85acfdb1",
+ "dom": "chartad85641b26",
 "width":    800,
 "height":    400,
 "xAxis": {
@@ -361,7 +361,8 @@
 "y": "Freq",
 "groups": "Hair",
 "type": "bar",
-"id": "chartad85acfdb1" 
+"query": "Eye == 'Brown'  && '^B' =~ Hair",
+"id": "chartad85641b26" 
 },
           data = [{"Hair":"Black","Eye":"Brown","Sex":"Male","Freq":32},{"Hair":"Brown","Eye":"Brown","Sex":"Male","Freq":53},{"Hair":"Red","Eye":"Brown","Sex":"Male","Freq":10},{"Hair":"Blond","Eye":"Brown","Sex":"Male","Freq":3},{"Hair":"Black","Eye":"Blue","Sex":"Male","Freq":11},{"Hair":"Brown","Eye":"Blue","Sex":"Male","Freq":50},{"Hair":"Red","Eye":"Blue","Sex":"Male","Freq":10},{"Hair":"Blond","Eye":"Blue","Sex":"Male","Freq":30},{"Hair":"Black","Eye":"Hazel","Sex":"Male","Freq":10},{"Hair":"Brown","Eye":"Hazel","Sex":"Male","Freq":25},{"Hair":"Red","Eye":"Hazel","Sex":"Male","Freq":7},{"Hair":"Blond","Eye":"Hazel","Sex":"Male","Freq":5},{"Hair":"Black","Eye":"Green","Sex":"Male","Freq":3},{"Hair":"Brown","Eye":"Green","Sex":"Male","Freq":15},{"Hair":"Red","Eye":"Green","Sex":"Male","Freq":7},{"Hair":"Blond","Eye":"Green","Sex":"Male","Freq":8},{"Hair":"Black","Eye":"Brown","Sex":"Female","Freq":36},{"Hair":"Brown","Eye":"Brown","Sex":"Female","Freq":66},{"Hair":"Red","Eye":"Brown","Sex":"Female","Freq":16},{"Hair":"Blond","Eye":"Brown","Sex":"Female","Freq":4},{"Hair":"Black","Eye":"Blue","Sex":"Female","Freq":9},{"Hair":"Brown","Eye":"Blue","Sex":"Female","Freq":34},{"Hair":"Red","Eye":"Blue","Sex":"Female","Freq":7},{"Hair":"Blond","Eye":"Blue","Sex":"Female","Freq":64},{"Hair":"Black","Eye":"Hazel","Sex":"Female","Freq":5},{"Hair":"Brown","Eye":"Hazel","Sex":"Female","Freq":29},{"Hair":"Red","Eye":"Hazel","Sex":"Female","Freq":7},{"Hair":"Blond","Eye":"Hazel","Sex":"Female","Freq":5},{"Hair":"Black","Eye":"Green","Sex":"Female","Freq":2},{"Hair":"Brown","Eye":"Green","Sex":"Female","Freq":14},{"Hair":"Red","Eye":"Green","Sex":"Female","Freq":7},{"Hair":"Blond","Eye":"Green","Sex":"Female","Freq":8}];          
                 
@@ -369,6 +370,19 @@
           
           //set value of source to the data from rCharts
           $source.val(JSON.stringify(data));
+          
+          //if query was input from rCharts
+          //put it in query and perform query
+          //then use that
+          //if blank then output will equal data
+          if(opts.query){
+            $query.val(opts.query);
+          } else {
+            $query.val("")
+          }
+          queryDirty = true;
+          performQuery();
+          
           //set value of rCharts config
           $chartConfig.val(
             js_beautify(JSON.stringify(opts),
@@ -381,7 +395,7 @@
         //these can be provided by dMyChart$chart( ... )
         
 
-        return drawChart(data,opts);
+        return drawChart(output,opts);
       })();
     });
   </script>

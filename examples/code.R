@@ -19,6 +19,9 @@ d1 <- dPlot(
 d1$setLib(".")
 d1$templates$page = "rCharts_objeq.html"
 d1$templates$script = "./chart_objeq.html"
+d1$set(
+  query = "Eye == 'Brown'  && '^B' =~ Hair"
+)
 d1
 
 d1$save("rCharts_objeq_example.html",cdn=F)

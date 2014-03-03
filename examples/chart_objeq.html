@@ -243,6 +243,19 @@
           
           //set value of source to the data from rCharts
           $source.val(JSON.stringify(data));
+          
+          //if query was input from rCharts
+          //put it in query and perform query
+          //then use that
+          //if blank then output will equal data
+          if(opts.query){
+            $query.val(opts.query);
+          } else {
+            $query.val("")
+          }
+          queryDirty = true;
+          performQuery();
+          
           //set value of rCharts config
           $chartConfig.val(
             js_beautify(JSON.stringify(opts),
@@ -255,7 +268,7 @@
         //these can be provided by dMyChart$chart( ... )
         {{{ chart }}}
 
-        return drawChart(data,opts);
+        return drawChart(output,opts);
       })();
     });
   </script>
