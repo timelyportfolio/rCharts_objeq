@@ -1,7 +1,7 @@
   <script type="text/javascript">
-    var compiledQuery, sourceJSON;
+    var compiledQuery, sourceJSON, output;
 
-    var $run, $config, dimpleChart, rChartsOriginal;
+    var $run, $config, $outputItems, $inputItems, dimpleChart, rChartsOriginal;
   
     var editor_data = ace.edit("editor-data");
     editor_data.setTheme("ace/theme/twilight");
@@ -219,6 +219,8 @@
 
     $(window).ready(function() {
       $run = $('#run');
+      $inputItems = $('#inputItems');
+      $outputItems = $('#outputItems');
       $config = $('#config');      
 
       beautifySource();
