@@ -1,6 +1,8 @@
 dimple_objeq:
   jshead: 
+    - js/angular.js
     - js/ace.js
+    - js/ui-ace.min.js
     - js/util.js
     - js/parser.js
     - js/objeq-parser-junqi.js
@@ -15,7 +17,9 @@ dimple_objeq:
   css: css/bootstrap.css
   cdn:
     jshead:
+      - ./js/angular.js
       - ./js/ace.js
+      - ./js/ui-ace.min.js
       - ./js/util.js
       - ./js/parser.js
       - ./js/objeq-parser-junqi.js

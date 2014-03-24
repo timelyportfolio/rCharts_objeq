@@ -24,7 +24,7 @@ d1$set(
 )
 d1
 
-d1$save("rCharts_objeq_example.html",cdn=F)
+d1$save("rCharts_objeq_example.html",cdn=T)
 
 
 #get data used by dimple for all of its examples as a first test
@@ -58,4 +58,4 @@ d2$templates$script = paste0(getwd(),"/chart_objeq.html")
 d2
 
 
-d2$save("rCharts_objeq_example2.html",cdn=F)
+d2$save("rCharts_objeq_example2.html",cdn=T)

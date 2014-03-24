@@ -50,14 +50,14 @@
   </style>    
     
   </head>
-  <body>
+  <body ng-app='myApp' ng-controller='MainCtrl'>
       <div id="wrap">
     <div class="container">
       <div class="row">
         <div class="col-sm-3">
           <div class="source">
             <h3>Source</h3>
-            <div class="sourceHolder">
+            <div class="sourceHolder" ng-model='exampleSource' ui-ace="aceOptions">
               <textarea class="form-control" rows="8"  id="source">
 
               </textarea>
@@ -67,7 +67,7 @@
         <div class="col-sm-4">
 <h3>Query (<a href="https://github.com/agilosoftware/objeq/wiki/Language-Reference" target="_blank">help </a> or <a href="http://www.kode4food.it/js/objeq/index.html" target="_blank"> examples</a>)</h3>
               <div class="input-group" style="width:100%;">
-              <div class="queryHolder"><textarea class="form-control" rows="8"  id="query"></textarea>
+              <div class="queryHolder" ng-model='exampleQuery' ui-ace="aceOptions"><textarea class="form-control" rows="8"  id="query"></textarea>
               </div>
                 <button id="run" class="btn btn-default"style="position:absolute;bottom:10px;right:15px;">Query</button>              
             </div>
@@ -75,7 +75,7 @@
         <div class="col-sm-5">
           <div class="result">
             <h3>Result<span id="outputItems"></span></h3>
-            <div class="resultHolder">
+            <div class="resultHolder" ng-model='exampleResult' ui-ace="aceOptions">
               <textarea class="form-control" rows="8"  id="result" readonly="readonly"></textarea>
             </div>
           </div>
@@ -84,7 +84,7 @@
       <div class="row">
         <div class="col-sm-3">
           <h3>rCharts Config</h3>
-          <div class="input-group" style="width:100%;">
+          <div class="input-group" style="width:100%;" ng-model='exampleConfig' ui-ace="aceOptions">
             <textarea class="form-control" rows=14 id="chartConfig"></textarea>
             <button id="config" class="btn btn-default"style="position:absolute;bottom:10px;right:20px;">Config</button>                          
           </div>
@@ -108,6 +108,30 @@
       </a>
     </div><!--container-->
   </div><!--footer-->
+  
+  <script>
+    myApp.controller('MainCtrl', function($scope, $http, $location){  
+      $scope.preview = true
+      
+      $scope.aceOptions = {
+        theme: 'solarized_light',
+        mode: 'json',
+        useWrapMode : true
+      }
+      
+      /*$scope.parseSpec = function(){
+        parse(JSON.parse($scope.exampleCode))
+      }
+      */
+      
+      $scope.$watch('exampleCode', _.debounce(function(newCode){
+        /*$scope.exampleCode = newCode
+        if ($scope.preview){
+          $scope.parseSpec()
+        }
+      }, 3000))*/
+    })
+   </script>
 
   </body>
 </html>

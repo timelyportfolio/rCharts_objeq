@@ -4,6 +4,7 @@
   <head>
     <link rel='stylesheet' href='./css/bootstrap.css'>
     
+    <script src='./js/ace.js' type='text/javascript'></script>
     <script src='./js/util.js' type='text/javascript'></script>
     <script src='./js/parser.js' type='text/javascript'></script>
     <script src='./js/objeq-parser-junqi.js' type='text/javascript'></script>
@@ -48,11 +49,12 @@
       height: 40px;
       background-color: #f5f5f5;
     }    
+
+    .tooltip { opacity: 1; }
     
-    textarea {
-      font-family: Courier New, Courier, serif;
-      font-size: 12px;
-    } 
+    .editor {
+      height : 300px;
+    }
   </style>    
     
   </head>
@@ -63,7 +65,7 @@
         <div class="col-sm-3">
           <div class="source">
             <h3>Source</h3>
-            <div class="sourceHolder">
+            <div id = "editor-data" class="sourceHolder editor">
               <textarea class="form-control" rows="8"  id="source">
 
               </textarea>
@@ -71,9 +73,9 @@
           </div>
         </div><!--col-sm-->
         <div class="col-sm-4">
-            <h3>Query (<a href="https://github.com/agilosoftware/objeq/wiki/Language-Reference" target="_blank">help </a> or <a href="http://www.kode4food.it/js/objeq/index.html" target="_blank"> examples</a>)</h3>
-            <div class="input-group" style="width:100%;">
-              <div class="queryHolder"><textarea class="form-control" rows="8"  id="query"></textarea>
+<h3>Query (<a href="https://github.com/agilosoftware/objeq/wiki/Language-Reference" target="_blank">help </a> or <a href="http://www.kode4food.it/js/objeq/index.html" target="_blank"> examples</a>)</h3>
+              <div class="input-group editor" style="width:100%;">
+              <div id = "editor-query" class="queryHolder editor"><textarea class="form-control" rows="8"  id="query"></textarea>
               </div>
                 <button id="run" class="btn btn-default"style="position:absolute;bottom:10px;right:15px;">Query</button>              
             </div>
@@ -81,8 +83,8 @@
         <div class="col-sm-5">
           <div class="result">
             <h3>Result<span id="outputItems"></span></h3>
-            <div class="resultHolder">
-              <textarea class="form-control" rows="8"  id="result" readonly="readonly"></textarea>
+            <div id = "editor-result" class="resultHolder editor">
+              
             </div>
           </div>
         </div><!--col-sm-->
@@ -90,30 +92,45 @@
       <div class="row">
         <div class="col-sm-3">
           <h3>rCharts Config</h3>
-          <div class="input-group" style="width:100%;">
-            <textarea class="form-control" rows=14 id="chartConfig"></textarea>
-            <button id="config" class="btn btn-default"style="position:absolute;bottom:10px;right:20px;">Config</button>                          
+          <div id = "editor-config" class="input-group editor" style="width:100%">
           </div>
+          <button id="config" class="btn btn-default"style="position:absolute;bottom:10px;right:23px;">Config</button>                                    
         </div>
         <div class="col-sm-9">
-            <div id='chartad85641b26' class='rChart examples'></div>  
+            <div id='chart23fc8851afd' class='rChart examples'></div>  
         </div>
       </div><!--row-->
     </div><!--container-->
   </div><!--wrap-->
 
     <script type="text/javascript">
-    var queryDirty = true, sourceDirty = true
-      , compiledQuery, sourceJSON;
+    var compiledQuery, sourceJSON;
 
-    var $query, $queries, $source, $result, $run, $inputItems, $outputItems, $chartConfig, $config, dimpleChart, rChartsOriginal;
+    var $run, $config, dimpleChart, rChartsOriginal;
+  
+    var editor_data = ace.edit("editor-data");
+    editor_data.setTheme("ace/theme/twilight");
+    editor_data.getSession().setMode("ace/mode/json");
+
+    var editor_query = ace.edit("editor-query");
+    editor_query.setTheme("ace/theme/twilight");
+    //editor_query.getSession().setMode("ace/mode/javascript");
+
+    var editor_result = ace.edit("editor-result");
+    editor_result.setTheme("ace/theme/twilight");
+    editor_result.getSession().setMode("ace/mode/json");
+    editor_result.setReadOnly(true);    
+    
+    var editor_config = ace.edit("editor-config");
+    editor_config.setTheme("ace/theme/twilight");
+    editor_config.getSession().setMode("ace/mode/json");
     
     var junqi = createJunqiEnvironment()
     var $objeq = junqi.objeq;
     junqi.registerExtensions(DefaultExtensions)    
 
     function beautifySource() {
-      $source.val(js_beautify($source.val(), {
+      editor_data.setValue(js_beautify(editor_data.getValue(), {
         indent_size: 2,
         preserve_newlines: true
       }));
@@ -121,24 +138,18 @@
 
     function performQuery() {
       try {
-        if ( queryDirty ) {
-          if(query.value === ""){
-            
-          } else {
-            compiledQuery = $objeq(query.value);
-          }
-          queryDirty = false;
+        if(editor_query.getValue().replace(/\s/g, '') === ""){
+          
+        } else {
+          compiledQuery = $objeq(editor_query.getValue());
         }
 
-        if ( sourceDirty ) {
-          sourceJSON = JSON.parse($source.val());
-          $inputItems.html("(" + sourceJSON.length + " items)");
-          sourceDirty = false;
-        }
+        sourceJSON = JSON.parse(editor_data.getValue());
+        $inputItems.html("(" + sourceJSON.length + " items)");
 
         // The actual query
         var start = new Date().getTime();
-        if(query.value === ""){   //if query is blank assume select all or output will be same as the data
+        if(editor_query.getValue().replace(/\s/g, '') === ""){   //if query is blank assume select all or output will be same as the data
           output = sourceJSON;
         } else {
           output = compiledQuery(sourceJSON);
@@ -146,7 +157,7 @@
         var elapsed = new Date().getTime() - start;
         $outputItems.html("(" + output.length + " items in " + elapsed + "ms)");
 
-        $result.val(js_beautify(JSON.stringify(output), {
+        editor_result.setValue(js_beautify(JSON.stringify(output), {
             indent_size: 2,
             preserve_newlines: true
         }));
@@ -159,21 +170,20 @@
       }
       catch ( err ) {
         $outputItems.html("(Error!)");
-        $result.val(err);
+        editor_result.setValue(err);
       }
     }
 
     function chooseQuery() {
       var queryString = $queries.find('option:selected').text();
       $query.val(queryString.replace(/^\s+|\s+$/g, ""));
-      queryDirty = true;
       performQuery();
     }
     
       ////**************************CHART CONFIGURATOR***************////////////////////
      function drawChart(data,opts){     
-        if (!($chartConfig.val() === "")) {
-          opts = JSON.parse($chartConfig.val());
+        if (!(editor_config.getValue().replace(/\s/g, '') === "")) {
+          opts = JSON.parse(editor_config.getValue().replace(/\s/g, ''));
         };
         
         var svg = d3.select("#" + opts.id).select("svg")
@@ -222,7 +232,7 @@
       if(d3.keys(opts.colorAxis).length > 0) {
         c = myChart[opts.colorAxis.type](opts.colorAxis.colorSeries,opts.colorAxis.palette) ;
       }
-      
+      /*
       //allow manipulation of default colors to use with dimple
       if(opts.defaultColors.length) {
         opts.defaultColors = opts.defaultColors[0];
@@ -239,7 +249,8 @@
           opts.defaultColors[i] = new dimple.color(d);
         })
         myChart.defaultColors = opts.defaultColors;
-      }  
+      } 
+      */
       
       //do series
       //set up a function since same for each
@@ -329,19 +340,12 @@
       $config.click(function(){
         dimpleChart = drawChart(dimpleChart.data, null);
       });
-      
-      $query.change(function() {
-        queryDirty = true;
-      });
-      $source.change(function() {
-        sourceDirty = true;
-      });
-      
+          
 
       ////**************************CHART BUILDER************************************/////////////
       dimpleChart = (function(){
           var opts = {
- "dom": "chartad85641b26",
+ "dom": "chart23fc8851afd",
 "width":    800,
 "height":    400,
 "xAxis": {
@@ -362,29 +366,222 @@
 "groups": "Hair",
 "type": "bar",
 "query": "Eye == 'Brown'  && '^B' =~ Hair",
-"id": "chartad85641b26" 
+"id": "chart23fc8851afd" 
 },
-          data = [{"Hair":"Black","Eye":"Brown","Sex":"Male","Freq":32},{"Hair":"Brown","Eye":"Brown","Sex":"Male","Freq":53},{"Hair":"Red","Eye":"Brown","Sex":"Male","Freq":10},{"Hair":"Blond","Eye":"Brown","Sex":"Male","Freq":3},{"Hair":"Black","Eye":"Blue","Sex":"Male","Freq":11},{"Hair":"Brown","Eye":"Blue","Sex":"Male","Freq":50},{"Hair":"Red","Eye":"Blue","Sex":"Male","Freq":10},{"Hair":"Blond","Eye":"Blue","Sex":"Male","Freq":30},{"Hair":"Black","Eye":"Hazel","Sex":"Male","Freq":10},{"Hair":"Brown","Eye":"Hazel","Sex":"Male","Freq":25},{"Hair":"Red","Eye":"Hazel","Sex":"Male","Freq":7},{"Hair":"Blond","Eye":"Hazel","Sex":"Male","Freq":5},{"Hair":"Black","Eye":"Green","Sex":"Male","Freq":3},{"Hair":"Brown","Eye":"Green","Sex":"Male","Freq":15},{"Hair":"Red","Eye":"Green","Sex":"Male","Freq":7},{"Hair":"Blond","Eye":"Green","Sex":"Male","Freq":8},{"Hair":"Black","Eye":"Brown","Sex":"Female","Freq":36},{"Hair":"Brown","Eye":"Brown","Sex":"Female","Freq":66},{"Hair":"Red","Eye":"Brown","Sex":"Female","Freq":16},{"Hair":"Blond","Eye":"Brown","Sex":"Female","Freq":4},{"Hair":"Black","Eye":"Blue","Sex":"Female","Freq":9},{"Hair":"Brown","Eye":"Blue","Sex":"Female","Freq":34},{"Hair":"Red","Eye":"Blue","Sex":"Female","Freq":7},{"Hair":"Blond","Eye":"Blue","Sex":"Female","Freq":64},{"Hair":"Black","Eye":"Hazel","Sex":"Female","Freq":5},{"Hair":"Brown","Eye":"Hazel","Sex":"Female","Freq":29},{"Hair":"Red","Eye":"Hazel","Sex":"Female","Freq":7},{"Hair":"Blond","Eye":"Hazel","Sex":"Female","Freq":5},{"Hair":"Black","Eye":"Green","Sex":"Female","Freq":2},{"Hair":"Brown","Eye":"Green","Sex":"Female","Freq":14},{"Hair":"Red","Eye":"Green","Sex":"Female","Freq":7},{"Hair":"Blond","Eye":"Green","Sex":"Female","Freq":8}];          
+          data = [
+ {
+ "Hair": "Black",
+"Eye": "Brown",
+"Sex": "Male",
+"Freq":     32 
+},
+{
+ "Hair": "Brown",
+"Eye": "Brown",
+"Sex": "Male",
+"Freq":     53 
+},
+{
+ "Hair": "Red",
+"Eye": "Brown",
+"Sex": "Male",
+"Freq":     10 
+},
+{
+ "Hair": "Blond",
+"Eye": "Brown",
+"Sex": "Male",
+"Freq":      3 
+},
+{
+ "Hair": "Black",
+"Eye": "Blue",
+"Sex": "Male",
+"Freq":     11 
+},
+{
+ "Hair": "Brown",
+"Eye": "Blue",
+"Sex": "Male",
+"Freq":     50 
+},
+{
+ "Hair": "Red",
+"Eye": "Blue",
+"Sex": "Male",
+"Freq":     10 
+},
+{
+ "Hair": "Blond",
+"Eye": "Blue",
+"Sex": "Male",
+"Freq":     30 
+},
+{
+ "Hair": "Black",
+"Eye": "Hazel",
+"Sex": "Male",
+"Freq":     10 
+},
+{
+ "Hair": "Brown",
+"Eye": "Hazel",
+"Sex": "Male",
+"Freq":     25 
+},
+{
+ "Hair": "Red",
+"Eye": "Hazel",
+"Sex": "Male",
+"Freq":      7 
+},
+{
+ "Hair": "Blond",
+"Eye": "Hazel",
+"Sex": "Male",
+"Freq":      5 
+},
+{
+ "Hair": "Black",
+"Eye": "Green",
+"Sex": "Male",
+"Freq":      3 
+},
+{
+ "Hair": "Brown",
+"Eye": "Green",
+"Sex": "Male",
+"Freq":     15 
+},
+{
+ "Hair": "Red",
+"Eye": "Green",
+"Sex": "Male",
+"Freq":      7 
+},
+{
+ "Hair": "Blond",
+"Eye": "Green",
+"Sex": "Male",
+"Freq":      8 
+},
+{
+ "Hair": "Black",
+"Eye": "Brown",
+"Sex": "Female",
+"Freq":     36 
+},
+{
+ "Hair": "Brown",
+"Eye": "Brown",
+"Sex": "Female",
+"Freq":     66 
+},
+{
+ "Hair": "Red",
+"Eye": "Brown",
+"Sex": "Female",
+"Freq":     16 
+},
+{
+ "Hair": "Blond",
+"Eye": "Brown",
+"Sex": "Female",
+"Freq":      4 
+},
+{
+ "Hair": "Black",
+"Eye": "Blue",
+"Sex": "Female",
+"Freq":      9 
+},
+{
+ "Hair": "Brown",
+"Eye": "Blue",
+"Sex": "Female",
+"Freq":     34 
+},
+{
+ "Hair": "Red",
+"Eye": "Blue",
+"Sex": "Female",
+"Freq":      7 
+},
+{
+ "Hair": "Blond",
+"Eye": "Blue",
+"Sex": "Female",
+"Freq":     64 
+},
+{
+ "Hair": "Black",
+"Eye": "Hazel",
+"Sex": "Female",
+"Freq":      5 
+},
+{
+ "Hair": "Brown",
+"Eye": "Hazel",
+"Sex": "Female",
+"Freq":     29 
+},
+{
+ "Hair": "Red",
+"Eye": "Hazel",
+"Sex": "Female",
+"Freq":      7 
+},
+{
+ "Hair": "Blond",
+"Eye": "Hazel",
+"Sex": "Female",
+"Freq":      5 
+},
+{
+ "Hair": "Black",
+"Eye": "Green",
+"Sex": "Female",
+"Freq":      2 
+},
+{
+ "Hair": "Brown",
+"Eye": "Green",
+"Sex": "Female",
+"Freq":     14 
+},
+{
+ "Hair": "Red",
+"Eye": "Green",
+"Sex": "Female",
+"Freq":      7 
+},
+{
+ "Hair": "Blond",
+"Eye": "Green",
+"Sex": "Female",
+"Freq":      8 
+} 
+];          
                 
           rChartsOriginal = {data:data,opts:opts};
           
           //set value of source to the data from rCharts
-          $source.val(JSON.stringify(data));
+          editor_data.setValue(JSON.stringify(data));
+          beautifySource();
           
           //if query was input from rCharts
           //put it in query and perform query
           //then use that
           //if blank then output will equal data
           if(opts.query){
-            $query.val(opts.query);
+            editor_query.setValue(opts.query);
           } else {
-            $query.val("")
+            editor_query.setValue("opts.query")
           }
-          queryDirty = true;
           performQuery();
           
           //set value of rCharts config
-          $chartConfig.val(
+          editor_config.setValue(
             js_beautify(JSON.stringify(opts),
                         {indent_size: 2,
                         preserve_newlines: true}
@@ -395,7 +592,8 @@
         //these can be provided by dMyChart$chart( ... )
         
 
-        return drawChart(output,opts);
+        return drawChart(
+          (editor_result.getValue().replace(/\s/g, '') === "") ? [{}] : JSON.parse(editor_result.getValue()),opts);
       })();
     });
   </script>

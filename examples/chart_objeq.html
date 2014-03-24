@@ -1,15 +1,31 @@
   <script type="text/javascript">
-    var queryDirty = true, sourceDirty = true
-      , compiledQuery, sourceJSON;
+    var compiledQuery, sourceJSON;
 
-    var $query, $queries, $source, $result, $run, $inputItems, $outputItems, $chartConfig, $config, dimpleChart, rChartsOriginal;
+    var $run, $config, dimpleChart, rChartsOriginal;
+  
+    var editor_data = ace.edit("editor-data");
+    editor_data.setTheme("ace/theme/twilight");
+    editor_data.getSession().setMode("ace/mode/json");
+
+    var editor_query = ace.edit("editor-query");
+    editor_query.setTheme("ace/theme/twilight");
+    //editor_query.getSession().setMode("ace/mode/javascript");
+
+    var editor_result = ace.edit("editor-result");
+    editor_result.setTheme("ace/theme/twilight");
+    editor_result.getSession().setMode("ace/mode/json");
+    editor_result.setReadOnly(true);    
+    
+    var editor_config = ace.edit("editor-config");
+    editor_config.setTheme("ace/theme/twilight");
+    editor_config.getSession().setMode("ace/mode/json");
     
     var junqi = createJunqiEnvironment()
     var $objeq = junqi.objeq;
     junqi.registerExtensions(DefaultExtensions)    
 
     function beautifySource() {
-      $source.val(js_beautify($source.val(), {
+      editor_data.setValue(js_beautify(editor_data.getValue(), {
         indent_size: 2,
         preserve_newlines: true
       }));
@@ -17,24 +33,18 @@
 
     function performQuery() {
       try {
-        if ( queryDirty ) {
-          if(query.value === ""){
-            
-          } else {
-            compiledQuery = $objeq(query.value);
-          }
-          queryDirty = false;
+        if(editor_query.getValue().replace(/\s/g, '') === ""){
+          
+        } else {
+          compiledQuery = $objeq(editor_query.getValue());
         }
 
-        if ( sourceDirty ) {
-          sourceJSON = JSON.parse($source.val());
-          $inputItems.html("(" + sourceJSON.length + " items)");
-          sourceDirty = false;
-        }
+        sourceJSON = JSON.parse(editor_data.getValue());
+        $inputItems.html("(" + sourceJSON.length + " items)");
 
         // The actual query
         var start = new Date().getTime();
-        if(query.value === ""){   //if query is blank assume select all or output will be same as the data
+        if(editor_query.getValue().replace(/\s/g, '') === ""){   //if query is blank assume select all or output will be same as the data
           output = sourceJSON;
         } else {
           output = compiledQuery(sourceJSON);
@@ -42,7 +52,7 @@
         var elapsed = new Date().getTime() - start;
         $outputItems.html("(" + output.length + " items in " + elapsed + "ms)");
 
-        $result.val(js_beautify(JSON.stringify(output), {
+        editor_result.setValue(js_beautify(JSON.stringify(output), {
             indent_size: 2,
             preserve_newlines: true
         }));
@@ -55,21 +65,20 @@
       }
       catch ( err ) {
         $outputItems.html("(Error!)");
-        $result.val(err);
+        editor_result.setValue(err);
       }
     }
 
     function chooseQuery() {
       var queryString = $queries.find('option:selected').text();
       $query.val(queryString.replace(/^\s+|\s+$/g, ""));
-      queryDirty = true;
       performQuery();
     }
     
       ////**************************CHART CONFIGURATOR***************////////////////////
      function drawChart(data,opts){     
-        if (!($chartConfig.val() === "")) {
-          opts = JSON.parse($chartConfig.val());
+        if (!(editor_config.getValue().replace(/\s/g, '') === "")) {
+          opts = JSON.parse(editor_config.getValue().replace(/\s/g, ''));
         };
         
         var svg = d3.select("#" + opts.id).select("svg")
@@ -118,7 +127,7 @@
       if(d3.keys(opts.colorAxis).length > 0) {
         c = myChart[opts.colorAxis.type](opts.colorAxis.colorSeries,opts.colorAxis.palette) ;
       }
-      
+      /*
       //allow manipulation of default colors to use with dimple
       if(opts.defaultColors.length) {
         opts.defaultColors = opts.defaultColors[0];
@@ -135,7 +144,8 @@
           opts.defaultColors[i] = new dimple.color(d);
         })
         myChart.defaultColors = opts.defaultColors;
-      }  
+      } 
+      */
       
       //do series
       //set up a function since same for each
@@ -225,14 +235,7 @@
       $config.click(function(){
         dimpleChart = drawChart(dimpleChart.data, null);
       });
-      
-      $query.change(function() {
-        queryDirty = true;
-      });
-      $source.change(function() {
-        sourceDirty = true;
-      });
-      
+          
 
       ////**************************CHART BUILDER************************************/////////////
       dimpleChart = (function(){
@@ -242,22 +245,22 @@
           rChartsOriginal = {data:data,opts:opts};
           
           //set value of source to the data from rCharts
-          $source.val(JSON.stringify(data));
+          editor_data.setValue(JSON.stringify(data));
+          beautifySource();
           
           //if query was input from rCharts
           //put it in query and perform query
           //then use that
           //if blank then output will equal data
           if(opts.query){
-            $query.val(opts.query);
+            editor_query.setValue(opts.query);
           } else {
-            $query.val("")
+            editor_query.setValue("opts.query")
           }
-          queryDirty = true;
           performQuery();
           
           //set value of rCharts config
-          $chartConfig.val(
+          editor_config.setValue(
             js_beautify(JSON.stringify(opts),
                         {indent_size: 2,
                         preserve_newlines: true}
@@ -268,7 +271,8 @@
         //these can be provided by dMyChart$chart( ... )
         {{{ chart }}}
 
-        return drawChart(output,opts);
+        return drawChart(
+          (editor_result.getValue().replace(/\s/g, '') === "") ? [{}] : JSON.parse(editor_result.getValue()),opts);
       })();
     });
   </script>
