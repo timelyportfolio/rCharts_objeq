@@ -12,6 +12,8 @@ dimple_objeq:
     - js/bootstrap.js
     - js/d3.js
     - js/dimple.v1.1.5.js
+    - js/d3-grid.js
+    - js/lodash.js
   css: css/bootstrap.css
   cdn:
     jshead:
@@ -27,4 +29,6 @@ dimple_objeq:
       - ./js/bootstrap.js
       - ./js/d3.js
       - ./js/dimple.v1.1.5.js
+      - ./js/d3-grid.js
+      - ./js/lodash.js
     css: ./css/bootstrap.css

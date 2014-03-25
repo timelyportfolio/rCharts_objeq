@@ -51,7 +51,6 @@ d2$legend(
   height = 20,
   horizontalAlign = "right"
 )
-d2
 d2$setLib(".")
 d2$templates$page = "rCharts_objeq.html"
 d2$templates$script = paste0(getwd(),"/chart_objeq.html")
@@ -59,3 +58,18 @@ d2
 
 
 d2$save("rCharts_objeq_example2.html",cdn=T)
+
+#try the facets
+d3 <- d1
+d3$templates$script = "./chart_objeq_facet.html"
+d3$set(facet = list(x=NULL,y=NULL))
+d3
+
+#try the colors
+d3$set( defaultColors = "d3.scale.category10()" )
+d3
+
+d4 <- d2
+d4$templates$script = "./chart_objeq_facet.html"
+d4$set(facet = list(x=NULL,y=NULL))
+d4

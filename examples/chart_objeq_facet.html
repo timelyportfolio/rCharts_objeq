@@ -1,0 +1,406 @@
+  <script type="text/javascript">
+    var compiledQuery, sourceJSON, output;
+
+    var $run, $config, $outputItems, $inputItems, subCharts, rChartsOriginal;
+  
+    var editor_data = ace.edit("editor-data");
+    editor_data.setTheme("ace/theme/twilight");
+    editor_data.getSession().setMode("ace/mode/json");
+
+    var editor_query = ace.edit("editor-query");
+    editor_query.setTheme("ace/theme/twilight");
+    //editor_query.getSession().setMode("ace/mode/javascript");
+
+    var editor_result = ace.edit("editor-result");
+    editor_result.setTheme("ace/theme/twilight");
+    editor_result.getSession().setMode("ace/mode/json");
+    editor_result.setReadOnly(true);    
+    
+    var editor_config = ace.edit("editor-config");
+    editor_config.setTheme("ace/theme/twilight");
+    editor_config.getSession().setMode("ace/mode/js");
+    
+    var junqi = createJunqiEnvironment()
+    var $objeq = junqi.objeq;
+    junqi.registerExtensions(DefaultExtensions)    
+
+    function beautifySource() {
+      editor_data.setValue(js_beautify(editor_data.getValue(), {
+        indent_size: 2,
+        preserve_newlines: true
+      }));
+    }
+
+    function performQuery() {
+      try {
+        if(editor_query.getValue().replace(/\s/g, '') === ""){
+          
+        } else {
+          compiledQuery = $objeq(editor_query.getValue());
+        }
+
+        sourceJSON = JSON.parse(editor_data.getValue());
+        $inputItems.html("(" + sourceJSON.length + " items)");
+
+        // The actual query
+        var start = new Date().getTime();
+        if(editor_query.getValue().replace(/\s/g, '') === ""){   //if query is blank assume select all or output will be same as the data
+          output = sourceJSON;
+        } else {
+          output = compiledQuery(sourceJSON);
+        }
+        var elapsed = new Date().getTime() - start;
+        $outputItems.html("(" + output.length + " items in " + elapsed + "ms)");
+
+        editor_result.setValue(js_beautify(JSON.stringify(output), {
+            indent_size: 2,
+            preserve_newlines: true
+        }));
+        
+        drawChart( output, (editor_config.getValue().replace(/\s/g, '') === "") ? {} : JSON.parse(editor_config.getValue()))
+      }
+      catch ( err ) {
+        $outputItems.html("(Error!)");
+        editor_result.setValue(err);
+      }
+    }
+
+    function chooseQuery() {
+      var queryString = $queries.find('option:selected').text();
+      $query.val(queryString.replace(/^\s+|\s+$/g, ""));
+      performQuery();
+    }
+    
+      ////**************************CHART CONFIGURATOR***************////////////////////
+     function drawChart(data,opts){     
+      
+        var svg = d3.select("#" + opts.id).select("svg")
+          .attr("width", opts.width)
+          .attr("height", opts.height);
+
+        if (svg.selectAll("g").length > 0) {
+          svg.selectAll("*").transition(1000).attr("opacity",0.00001).remove()
+        } else {
+          svg = dimple.newSvg("#" + opts.id, opts.width, opts.height);
+        }
+          
+  
+        subCharts = [];
+        
+    var c = null;
+    
+    function buildSeries(layer, hidden, myChart){
+        var x = buildAxis("x", layer, myChart);
+        x.hidden = hidden;
+        
+        var y = buildAxis("y", layer, myChart);
+        y.hidden = hidden;
+        
+        //z for bubbles
+        var z = null;
+        if (!(typeof(layer.zAxis) === 'undefined') && layer.zAxis.type){
+          z = buildAxis("z", layer, myChart);
+        };
+        
+        //here think I need to evaluate group and if missing do null
+        //as the group argument
+        //if provided need to use groups from layer
+        var s = new dimple.series(myChart, null, x, y, z, c, dimple.plot[layer.type], dimple.aggregateMethod.avg, dimple.plot[layer.type].stacked);
+        
+        if(layer.hasOwnProperty("groups")) {
+          s.categoryFields = (typeof layer.groups === "object") ? layer.groups : [layer.groups];
+          //series offers an aggregate method that we will also need to check if available
+          //options available are avg, count, max, min, sum
+          if (!(typeof(layer.aggregate) === 'undefined')) {
+            s.aggregate = eval(layer.aggregate);
+          }
+          if (!(typeof(layer.lineWeight) === 'undefined')) {
+            s.lineWeight = eval(layer.lineWeight);
+          }
+          if (!(typeof(layer.barGap) === 'undefined')) {
+            s.barGap = eval(layer.barGap);
+          }    
+        };
+        myChart.series.push(s);
+        return s;
+      };
+    
+    //function to build axes
+    function buildAxis(position,layer,myChart){
+      var axis;
+      var axisopts = opts[position+"Axis"];
+      
+      if(axisopts.measure) {
+        axis = myChart[axisopts.type](position,layer[position],axisopts.measure);
+      } else {
+        axis = myChart[axisopts.type](position, layer[position]);
+      };
+      if(!(axisopts.type === "addPctAxis")) axis.showPercent = axisopts.showPercent;
+      if (axisopts.orderRule) axis.addOrderRule(axisopts.orderRule);
+      if (axisopts.grouporderRule) axis.addGroupOrderRule(axisopts.grouporderRule);  
+      if (axisopts.overrideMin) axis.overrideMin = axisopts.overrideMin;
+      if (axisopts.overrideMax) axis.overrideMax = axisopts.overrideMax;
+      if (axisopts.overrideMax) axis.overrideMax = axisopts.overrideMax;
+      if (axisopts.inputFormat) axis.dateParseFormat = axisopts.inputFormat;
+      if (axisopts.outputFormat) axis.tickFormat = axisopts.outputFormat;    
+      return axis;
+    };
+        
+        
+  
+    
+  
+    //if facet not provided for x or y make Dummy variable
+    opts.facet.x = opts.facet.x ? opts.facet.x : "Dummy"
+    opts.facet.y = opts.facet.y ? opts.facet.y : "Dummy"    
+    if(opts.facet.x === "Dummy" || opts.facet.y === "Dummy") {
+      data.forEach(function(d){
+        d.Dummy = 1;
+      })
+    }
+  
+    var rows = d3.set(data.map(function(d){return d[opts.facet.y]})).values();
+    var nrow = opts.facet.nrow ? opts.facet.nrow : rows.length;
+    var cols = d3.set(data.map(function(d){return d[opts.facet.x]})).values()
+    var ncol = opts.facet.ncol ? opts.facet.ncol : cols.length;
+    
+    var tuples = d3.merge(rows.map(function(row,irow){return cols.map(function(col,icol){return {key:row + "~" + col, values: {"row":irow, "col":icol} }})}))
+      
+    var grid = d3.layout.grid()
+      .rows( nrow )
+      .cols( ncol )
+      .size([ opts.width, opts.height-100])
+      .bands();
+    
+    var svgGrid = d3.select("#" + opts.id).select("svg")
+      .attr("width", opts.width)
+      .attr("height", opts.height);
+  
+    grid(tuples);
+  
+  /* var cells = d3.select("#" + opts.id).selectAll("svg")
+      .data(grid(tuples))
+      .enter()
+        .append("svg")
+          .attr("class", "cell")
+          .attr("id", function(d) {
+            return d.key;
+          })
+          .attr("transform", function(d, i) {
+             return "translate(" + d.x + "," + d.y + ")"
+           })
+          .attr("width", grid.nodeSize()[0])
+          .attr("height", grid.nodeSize()[1]);
+  
+    var color = d3.scale.linear()
+      .domain([0, 3, 6])
+      .range(["red", "lightgray", "green"]);
+      
+  /*  cells.selectAll("rect")
+      .data(function(d){
+        return [d];
+      })
+        .enter().append("rect")
+          .attr("width", grid.nodeSize()[0])
+          .attr("height", grid.nodeSize()[1])
+          .style("fill", function(d) {return color(d.values.row)});         
+  */
+      tuples.forEach(function(cell,cellnum) {
+          //cell = d3.select(cell);
+      
+          // Filter the data set for the quarter and the price tier
+          // of the current shape
+          var filteredData = dimple.filterData(data, opts.facet.x, cell.key.split('~')[1]);
+          filteredData = dimple.filterData(filteredData, opts.facet.y, cell.key.split('~')[0]);    
+          
+          // Draw a new chart which will go in the current shape
+          var subChart = new dimple.chart(svgGrid, filteredData);
+  
+          
+          // Get the shape from the main chart on which this chart is based
+          var shape = d3.select(this);
+  
+  
+          // Position the chart inside the shape
+          subChart.height = grid.nodeSize()[1]
+          subChart.width = grid.nodeSize()[0]      
+          
+          if (opts.margins) {
+            subChart.setBounds(
+              parseFloat(cell.x + opts.margins.left),
+              parseFloat(cell.y + opts.margins.bottom),
+              subChart.width - opts.margins.right- opts.margins.left,
+              subChart.height - opts.margins.top - opts.margins.bottom
+            )
+          } else {
+            subChart.setBounds(
+              parseFloat(cell.x + 50), 
+              parseFloat(cell.y + 10),
+              parseFloat(grid.nodeSize()[0] - 50),
+              parseFloat(grid.nodeSize()[1]) - 10
+            );
+          }
+    
+    //dimple allows use of custom CSS with noFormats
+    if(opts.noFormats) { subChart.noFormats = opts.noFormats; };
+    
+    //need to fix later for better colorAxis support
+    if(d3.keys(opts.colorAxis).length > 0) {
+      c = subChart[opts.colorAxis.type](opts.colorAxis.colorSeries,opts.colorAxis.palette) ;
+    }
+  
+    /*
+    //allow manipulation of default colors to use with dimple
+    if(defaultColors.length) {
+      //move transform of defaultColors to top
+      subChart.defaultColors = defaultColors;
+    } 
+    */
+    
+    buildSeries(opts, false, subChart);
+    if (opts.layers.length > 0) {
+      opts.layers.forEach(function(layer){
+        buildSeries(layer, true, subChart);
+      })
+    }
+    //unsure if this is best but if legend is provided (not empty) then evaluate
+    if(d3.keys(opts.legend).length > 0) {
+      var l =subChart.addLegend();
+      d3.keys(opts.legend).forEach(function(d){
+        l[d] = opts.legend[d];
+      });
+    }
+    //quick way to get this going but need to make this cleaner
+    if(opts.storyboard) {
+      subChart.setStoryboard(opts.storyboard);
+    };
+    subCharts.push(subChart);
+  })
+  
+  subCharts.forEach(function(subChart) {
+      subChart.draw();
+  })
+  
+  //get rid of all y for those not in column 1
+  //can easily customize this to only remove bits and pieces
+  if(opts.facet.removeAxes) {
+    ["x","y","z"].forEach(function(position){
+      //work on axis scaling
+      //assume if remove then same scales for all charts
+      axisdomain = [];      
+      subCharts.forEach(function(subChart){
+        subChart.axes.forEach(function(axis){
+          if (axis.position === position && !axis._hasCategories()){
+            axisdomain.push(axis._scale.domain())
+          }
+        })
+      });
+      axisdomain = d3.extent(_.flatten(axisdomain));
+      subCharts.forEach(function(subChart){
+        subChart.axes.forEach(function(axis){
+          if (axis.position === position && !axis._hasCategories()){
+            axis.overrideMin = axisdomain[0];
+            axis.overrideMax = axisdomain[1];
+          }
+        })
+        subChart.draw(null,true)
+      });
+    })
+    
+    //evaluate which do not fall in column 1 or row 1 to remove
+    var xpos = d3.extent(subCharts,function(d){return d.x});
+    var ypos = d3.extent(subCharts,function(d){return d.y});    
+    subCharts.filter(function(d){
+      return d.x!=xpos[0];
+    }).forEach(function(d){
+      d.axes.forEach(function(axis){
+        if (axis.position === "y"){
+          axis.shapes.remove();
+          axis.titleShape.remove();
+        }
+      })
+    });
+    //now x for those not in row 1
+    subCharts.filter(function(d){
+      return d.y!=ypos[1];
+    }).forEach(function(d){
+      d.axes.forEach(function(axis){
+        if (axis.position === "x"){
+          axis.shapes.remove();
+          axis.titleShape.remove();
+        }
+      })
+    });
+  }
+  
+  
+  //also need to fix colors since dimple
+  //does not use category scale for defaultColors like d3
+  if (typeof(eval(opts.defaultColors)) === "function"){
+    var defaultColors = eval(opts.defaultColors);
+    subCharts.forEach(function(subChart) {
+      subChart.series[0].shapes
+        //.transition()
+        .style("fill", function(d){
+          return defaultColors(d.aggField[d.aggField.length-1])
+        })
+        .style("stroke", function(d){
+          return defaultColors(d.aggField[d.aggField.length-1])
+        })
+        //.delay(1000)
+      })
+  }
+}
+
+    $(window).ready(function() {
+      $run = $('#run');
+      $inputItems = $('#inputItems');
+      $outputItems = $('#outputItems');
+      $config = $('#config');      
+
+      beautifySource();
+      //chooseQuery();
+
+      $run.click(performQuery);
+      $config.click(performQuery);
+          
+
+      ////**************************CHART BUILDER************************************/////////////
+      (function(){
+          var opts = {{{ opts }}},
+          data = {{{ data }}};          
+                
+          rChartsOriginal = {data:data,opts:opts};
+          
+          //set value of source to the data from rCharts
+          editor_data.setValue(JSON.stringify(data));
+          beautifySource();
+          
+          //if query was input from rCharts
+          //put it in query and perform query
+          //then use that
+          //if blank then output will equal data
+          if(opts.query){
+            editor_query.setValue(opts.query);
+          } else {
+            editor_query.setValue("")
+          }
+        
+          //set value of rCharts config
+          editor_config.setValue(
+            js_beautify(JSON.stringify(opts),
+                        {indent_size: 2,
+                        preserve_newlines: false}
+            )
+          );
+
+          performQuery();
+          //catch all for other options
+        //these can be provided by dMyChart$chart( ... )
+        {{{ chart }}}
+
+        drawChart(
+          (editor_result.getValue().replace(/\s/g, '') === "") ? [{}] : JSON.parse(editor_result.getValue()),opts);
+      })();
+    });
+  </script>

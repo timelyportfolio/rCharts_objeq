@@ -78,7 +78,7 @@
       ////**************************CHART CONFIGURATOR***************////////////////////
      function drawChart(data,opts){     
         if (!(editor_config.getValue().replace(/\s/g, '') === "")) {
-          opts = JSON.parse(editor_config.getValue().replace(/\s/g, ''));
+          opts = JSON.parse(editor_config.getValue());
         };
         
         var svg = d3.select("#" + opts.id).select("svg")
@@ -250,7 +250,7 @@
           if(opts.query){
             editor_query.setValue(opts.query);
           } else {
-            editor_query.setValue("opts.query")
+            editor_query.setValue("")
           }
           performQuery();
           
