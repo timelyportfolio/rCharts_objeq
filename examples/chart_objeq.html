@@ -58,10 +58,8 @@
         }));
         
         //update chart
-        if(dimpleChart) {
-          dimpleChart.data = output;
-          dimpleChart.draw(1000);
-        }
+        dimpleChart = drawChart( output, (editor_config.getValue().replace(/\s/g, '') === "") ? {} : JSON.parse(editor_config.getValue()) )
+        
       }
       catch ( err ) {
         $outputItems.html("(Error!)");
@@ -77,9 +75,6 @@
     
       ////**************************CHART CONFIGURATOR***************////////////////////
      function drawChart(data,opts){     
-        if (!(editor_config.getValue().replace(/\s/g, '') === "")) {
-          opts = JSON.parse(editor_config.getValue());
-        };
         
         var svg = d3.select("#" + opts.id).select("svg")
           .attr("width", opts.width)
@@ -227,9 +222,8 @@
       //chooseQuery();
 
       $run.click(performQuery);
-      $config.click(function(){
-        dimpleChart = drawChart(dimpleChart.data, null);
-      });
+      $config.click(performQuery);
+
           
 
       ////**************************CHART BUILDER************************************/////////////
@@ -252,7 +246,6 @@
           } else {
             editor_query.setValue("")
           }
-          performQuery();
           
           //set value of rCharts config
           editor_config.setValue(
@@ -262,6 +255,8 @@
             )
           );
 
+          performQuery();
+          
         //catch all for other options
         //these can be provided by dMyChart$chart( ... )
         {{{ chart }}}

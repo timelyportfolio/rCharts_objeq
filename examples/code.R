@@ -65,9 +65,17 @@ d3$templates$script = "./chart_objeq_facet.html"
 d3$set(facet = list(x=NULL,y=NULL))
 d3
 
-#try the colors
-d3$set( defaultColors = "d3.scale.category10()" )
+#try the colors and add some options and remove query
+d3$set(
+  defaultColors = "d3.scale.category10()",
+  type = "line",
+  groups = c("Eye", "Hair"),
+  facet = list( x = "Eye", y = NULL, removeAxes = TRUE ),
+  query = ""
+)
 d3
+
+#d3$save("rCharts_objeq_example3.html",cdn=T)
 
 d4 <- d2
 d4$templates$script = "./chart_objeq_facet.html"

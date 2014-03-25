@@ -99,7 +99,7 @@
           <button id="config" class="btn btn-default"style="position:absolute;bottom:10px;right:23px;">Config</button>                                    
         </div>
         <div class="col-sm-9">
-            <div id='chart252c179d15b0' class='rChart examples'></div>  
+            <div id='chart19a4456018bf' class='rChart examples'></div>  
         </div>
       </div><!--row-->
     </div><!--container-->
@@ -165,10 +165,8 @@
         }));
         
         //update chart
-        if(dimpleChart) {
-          dimpleChart.data = output;
-          dimpleChart.draw(1000);
-        }
+        dimpleChart = drawChart( output, (editor_config.getValue().replace(/\s/g, '') === "") ? {} : JSON.parse(editor_config.getValue()) )
+        
       }
       catch ( err ) {
         $outputItems.html("(Error!)");
@@ -184,9 +182,6 @@
     
       ////**************************CHART CONFIGURATOR***************////////////////////
      function drawChart(data,opts){     
-        if (!(editor_config.getValue().replace(/\s/g, '') === "")) {
-          opts = JSON.parse(editor_config.getValue());
-        };
         
         var svg = d3.select("#" + opts.id).select("svg")
           .attr("width", opts.width)
@@ -334,15 +329,14 @@
       //chooseQuery();
 
       $run.click(performQuery);
-      $config.click(function(){
-        dimpleChart = drawChart(dimpleChart.data, null);
-      });
+      $config.click(performQuery);
+
           
 
       ////**************************CHART BUILDER************************************/////////////
       dimpleChart = (function(){
           var opts = {
- "dom": "chart252c179d15b0",
+ "dom": "chart19a4456018bf",
 "width":    800,
 "height":    400,
 "xAxis": {
@@ -368,7 +362,7 @@
 "y": "OperatingProfit",
 "groups": [ "SKU", "Channel" ],
 "type": "bubble",
-"id": "chart252c179d15b0" 
+"id": "chart19a4456018bf" 
 },
           data = [
  {
@@ -2332,7 +2326,6 @@
           } else {
             editor_query.setValue("")
           }
-          performQuery();
           
           //set value of rCharts config
           editor_config.setValue(
@@ -2342,6 +2335,8 @@
             )
           );
 
+          performQuery();
+          
         //catch all for other options
         //these can be provided by dMyChart$chart( ... )
         
