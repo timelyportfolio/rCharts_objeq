@@ -84,3 +84,57 @@ d4 <- d2
 d4$templates$script = "./chart_objeq_facet.html"
 d4$set(facet = list(x=NULL,y=NULL))
 d4
+
+
+
+
+
+
+
+##do it with data from research affiliates JOF article
+#<blockquote>
+#  <small><em style = "background-color:#E7E4E4;">data source:</em></small><br>
+#  Arnott, Robert D., et al.<br>
+#  <strong>The Surprising Alpha from Malkiel's Monkey and Upside-Down Strategies</strong><br>
+#  The Journal of Portfolio Management 39.4 (2013): 91-105.
+#</blockquote>
+#read in the csv version of data
+rebalStats <- read.csv(
+  "../../research_researchaffiliates/global rebalance allocation stats.csv",
+  stringsAsFactors = F
+)
+
+#make long form
+rebalStats.melt <- reshape2::melt(
+  rebalStats,
+  id.vars = 1:3,
+  variable.name = "Statistic",
+  value.name = "Value"
+)
+rebalStats.melt$Value = as.numeric(rebalStats.melt$Value)
+
+d5 <- dPlot(
+  x = "Value",
+  y = c("Strategy","Geography"),
+  groups = c("Statistic","Geography","StrategyType","Strategy"),
+  data = rebalStats.melt,
+  type = "bubble",
+  facet = list( y = "Statistic" ),
+  query = 
+  "Statistic IN ['Return','CAPMBeta','CAPMAlpha'] && (StrategyType == 'Averages' ||  '.*Weight' =~ StrategyType )",
+  defaultColors = "d3.scale.category20()",
+  height = 800,
+  width = 800,
+  margins = list( bottom = 10, left = 250, top = 30, right = 0)
+)
+d5$xAxis (
+  type = "addMeasureAxis",
+  outputFormat = ".2%" 
+)
+d5$yAxis ( type = "addCategoryAxis" )
+d5$setLib(".")
+d5$templates$page = "rCharts_objeq.html"
+d5$templates$script = "./chart_objeq_facet.html"
+d5
+
+#d5$save( "rCharts_objeq_researchaffiliates.html", cdn = T)
