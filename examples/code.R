@@ -70,8 +70,8 @@ d3$set(
   defaultColors = "d3.scale.category10()",
   type = "line",
   groups = c("Eye", "Hair"),
-  facet = list( x = "Eye", y = NULL, removeAxes = TRUE ),
-  query = ""
+  facet = list( x = "Eye", y = "NULL", removeAxes = TRUE ),
+  query = NULL
 )
 d3
 
