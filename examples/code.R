@@ -72,7 +72,9 @@ d3$set(
   yAxis = list(type = "addPctAxis" ),
   groups = c("Eye", "Hair"),
   facet = list( x = "Eye", removeAxes = TRUE ),
-  query = NULL
+  query = NULL,
+  margins = list( bottom = 0, left = 60, top = 50, right = 0),
+  height = 450
 )
 d3
 

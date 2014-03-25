@@ -25,7 +25,7 @@
       margin-left: auto; 
       margin-right: auto;
       width: 800px;
-      height: 400px;
+      height: 450px;
     }  
     </style>
     
@@ -335,7 +335,7 @@
           if (opts.margins) {
             subChart.setBounds(
               parseFloat(cell.x + opts.margins.left),
-              parseFloat(cell.y + opts.margins.bottom),
+              parseFloat(cell.y + opts.margins.top),
               subChart.width - opts.margins.right- opts.margins.left,
               subChart.height - opts.margins.top - opts.margins.bottom
             )
@@ -485,7 +485,7 @@
           var opts = {
  "dom": "chart19a41a521b88",
 "width":    800,
-"height":    400,
+"height":    450,
 "xAxis": {
  "type": "addCategoryAxis",
 "showPercent": false 
@@ -508,6 +508,12 @@
  "x": "Eye",
 "removeAxes": true,
 "y": "" 
+},
+"margins": {
+ "bottom":      0,
+"left":     60,
+"top":     50,
+"right":      0 
 } 
 },
           data = [
