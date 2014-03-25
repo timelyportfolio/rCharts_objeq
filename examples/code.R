@@ -69,8 +69,9 @@ d3
 d3$set(
   defaultColors = "d3.scale.category10()",
   type = "line",
+  yAxis = list(type = "addPctAxis" ),
   groups = c("Eye", "Hair"),
-  facet = list( x = "Eye", y = "NULL", removeAxes = TRUE ),
+  facet = list( x = "Eye", removeAxes = TRUE ),
   query = NULL
 )
 d3

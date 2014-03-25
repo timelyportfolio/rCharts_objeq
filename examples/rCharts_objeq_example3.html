@@ -167,8 +167,8 @@
         drawChart( output, (editor_config.getValue().replace(/\s/g, '') === "") ? {} : JSON.parse(editor_config.getValue()))
       }
       catch ( err ) {
-        $outputItems.html("(Error!)");
-        editor_result.setValue(err);
+        $outputItems.html("(Error! :" + err + ")" );
+        //editor_result.setValue(err);
       }
     }
 
@@ -449,10 +449,18 @@
       subChart.series[0].shapes
         //.transition()
         .style("fill", function(d){
-          return defaultColors(d.aggField[d.aggField.length-1])
+          if(d.key) {
+            return defaultColors(d.aggField[d.aggField.length-1])
+          } else {
+            return defaultColors( d[d.length-1] )
+          }
         })
         .style("stroke", function(d){
-          return defaultColors(d.aggField[d.aggField.length-1])
+          if(d.key) {
+            return defaultColors(d.aggField[d.aggField.length-1])
+          } else {
+            return defaultColors( d[d.length-1] )
+          }
         })
         //.delay(1000)
       })
@@ -495,11 +503,11 @@
 "y": "Freq",
 "groups": [ "Eye", "Hair" ],
 "type": "line",
-"query": "",
 "id": "chart19a41a521b88",
 "facet": {
  "x": "Eye",
-"removeAxes": true 
+"removeAxes": true,
+"y": "" 
 } 
 },
           data = [
