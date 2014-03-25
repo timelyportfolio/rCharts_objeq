@@ -125,7 +125,7 @@ d5 <- dPlot(
   defaultColors = "d3.scale.category20()",
   height = 800,
   width = 800,
-  margins = list( bottom = 10, left = 250, top = 30, right = 0)
+  margins = list( bottom = 10, left = 300, top = 30, right = 0)
 )
 d5$xAxis (
   type = "addMeasureAxis",
