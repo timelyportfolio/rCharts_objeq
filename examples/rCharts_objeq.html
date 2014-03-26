@@ -10,7 +10,7 @@
     <script src='{{{ . }}}' type='text/javascript'></script>
     {{/ assets.jshead }}
     
-    <style>
+   <!--style>
     .rChart {
       display: block;
       margin-left: auto; 
@@ -18,7 +18,7 @@
       width: 800px;
       height: 400px;
     }  
-    </style>
+    </style-->
     
   <style type="text/css">
     html,
@@ -90,7 +90,7 @@
           <button id="config" class="btn btn-default"style="position:absolute;bottom:10px;right:23px;">Config</button>                                    
         </div>
         <div class="col-sm-9">
-            <div id='chart19a45d7b7e28' class='rChart examples'></div>  
+           <{{container}} id = '{{ chartId }}' class = 'rChart {{ lib }}'></{{ container}}>
         </div>
       </div><!--row-->
     </div><!--container-->
