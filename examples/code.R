@@ -5,16 +5,47 @@
 #install()
 
 library(rCharts)
+library(jsonlite)  #explicitly require this to use jsonlite toJSON
 options(viewer=NULL)
 #override read_template to avoid whole reinstall of rCharts
 #looks like it will not be this simple
-read_template <- function( template ){
-  read_file( template )
-}
+#read_template <- function( template ){
+#  read_file( template )
+#}
 
 hairEye <- as.data.frame(HairEyeColor)
 
-d1 <- dPlot(
+rChartsObjeq <- setRefClass(
+  "rChartsObjeq",
+  contains = "Dimple",
+  methods = list(
+    initialize = function(){
+      callSuper(); 
+    },
+    render = function(chartId = NULL, cdn = F, static = T){
+      params$dom <<- chartId %||% params$dom
+      template = read_file(getOption('RCHART_TEMPLATE', templates$page))
+      assets = Map("c", get_assets(LIB, static = static, cdn = cdn), html_assets)
+      html = render_template(template, list(
+        params = params,
+        assets = assets,
+        chartId = params$dom,
+        script = .self$html(params$dom),
+        CODE = srccode,
+        lib = LIB$name,
+        tObj = tObj,
+        container = container
+      ))
+    }
+))
+
+objeqPlot <- function(x, data, ...){
+  myChart <- rChartsObjeq$new()
+  myChart$getChartParams(x, data, ...)
+  return(myChart$copy())
+}
+
+d1 <- objeqPlot(
   Freq ~ Sex,
   groups = "Hair",
   data = hairEye,
@@ -22,6 +53,8 @@ d1 <- dPlot(
 )
 #d1$set(defaultColors=c())
 d1$setLib(".")
+
+
 d1$templates$page = "rCharts_objeq.html"
 d1$templates$script = "./chart_objeq.html"
 d1$setTemplate( afterScript = "<script></script>" )
@@ -119,7 +152,7 @@ rebalStats.melt <- reshape2::melt(
 )
 rebalStats.melt$Value = as.numeric(rebalStats.melt$Value)
 
-d5 <- dPlot(
+d5 <- objeqPlot(
   x = "Value",
   y = c("Strategy","Geography"),
   groups = c("Statistic","Geography","StrategyType","Strategy"),
