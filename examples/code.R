@@ -1,6 +1,6 @@
 #if you have not installed the newest dev branch of rCharts
 #require(devtools)
-#install_github("rCharts","timelyportfolio",ref="objeq")
+#install_github("rCharts","timelyportfolio",ref="dimple_layer")
 #setwd("C:/Users/Kent.TLEAVELL_NT/Dropbox/development/r/rCharts")
 #install()
 
@@ -63,7 +63,7 @@ d1$set(
 )
 d1
 
-d1$save("rCharts_objeq_example.html",cdn=T)
+#d1$save("rCharts_objeq_example.html",cdn=T)
 
 
 #get data used by dimple for all of its examples as a first test
@@ -92,11 +92,11 @@ d2$legend(
 )
 d2$setLib(".")
 d2$templates$page = "rCharts_objeq.html"
-d2$templates$script = paste0(getwd(),"/chart_objeq.html")
+d2$templates$script = "./chart_objeq.html"
 d2
 
 
-d2$save("rCharts_objeq_example2.html",cdn=T)
+#d2$save("rCharts_objeq_example2.html",cdn=T)
 
 #try the facets
 d3 <- d1
