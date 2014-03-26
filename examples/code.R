@@ -6,6 +6,11 @@
 
 library(rCharts)
 options(viewer=NULL)
+#override read_template to avoid whole reinstall of rCharts
+#looks like it will not be this simple
+read_template <- function( template ){
+  read_file( template )
+}
 
 hairEye <- as.data.frame(HairEyeColor)
 
@@ -19,6 +24,7 @@ d1 <- dPlot(
 d1$setLib(".")
 d1$templates$page = "rCharts_objeq.html"
 d1$templates$script = "./chart_objeq.html"
+d1$setTemplate( afterScript = "<script></script>" )
 d1$set(
   query = "Eye == 'Brown'  && '^B' =~ Hair"
 )
