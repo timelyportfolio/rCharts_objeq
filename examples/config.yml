@@ -17,18 +17,18 @@ dimple_objeq:
   css: css/bootstrap.css
   cdn:
     jshead:
-      - ./js/ace.js
-      - ./js/util.js
-      - ./js/parser.js
-      - ./js/objeq-parser-junqi.js
-      - ./js/compiler.js
-      - ./js/junqi.js
-      - ./js/index_junqi_extensions.js
-      - ./js/beautify.js
-      - ./js/jquery.min.js
-      - ./js/bootstrap.js
-      - ./js/d3.js
-      - ./js/dimple.v1.1.5.js
-      - ./js/d3-grid.js
-      - ./js/lodash.js
-    css: ./css/bootstrap.css
+      - http://timelyportfolio.github.io/rCharts_objeq/examples/js/ace.js
+      - http://timelyportfolio.github.io/rCharts_objeq/examples/js/util.js
+      - http://timelyportfolio.github.io/rCharts_objeq/examples/js/parser.js
+      - http://timelyportfolio.github.io/rCharts_objeq/examples/js/objeq-parser-junqi.js
+      - http://timelyportfolio.github.io/rCharts_objeq/examples/js/compiler.js
+      - http://timelyportfolio.github.io/rCharts_objeq/examples/js/junqi.js
+      - http://timelyportfolio.github.io/rCharts_objeq/examples/js/index_junqi_extensions.js
+      - http://timelyportfolio.github.io/rCharts_objeq/examples/js/beautify.js
+      - http://timelyportfolio.github.io/rCharts_objeq/examples/js/jquery.min.js
+      - http://timelyportfolio.github.io/rCharts_objeq/examples/js/bootstrap.js
+      - http://timelyportfolio.github.io/rCharts_objeq/examples/js/d3.js
+      - http://timelyportfolio.github.io/rCharts_objeq/examples/js/dimple.v1.1.5.js
+      - http://timelyportfolio.github.io/rCharts_objeq/examples/js/d3-grid.js
+      - http://timelyportfolio.github.io/rCharts_objeq/examples/js/lodash.js
+    css: http://timelyportfolio.github.io/rCharts_objeq/examples/css/bootstrap.css

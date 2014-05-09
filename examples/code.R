@@ -75,7 +75,7 @@ data <- read.delim(
 colnames(data) <- gsub("[.]","",colnames(data))
 
 ### example 16 Scatter
-d2 <- dPlot(
+d2 <- objeqPlot(
   OperatingProfit~UnitSales,
   groups = c("SKU","Channel"),
   data = subset(data, Date == "01/12/2012"),
@@ -93,6 +93,7 @@ d2$legend(
 d2$setLib(".")
 d2$templates$page = "rCharts_objeq.html"
 d2$templates$script = "./chart_objeq.html"
+d1$setTemplate( afterScript = "<script></script>" )
 d2
 
 
